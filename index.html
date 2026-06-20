@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מבחן - מערכות תפעול ושירות</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .question-container {
+            padding: 40px;
+            min-height: 400px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .question-type {
+            background: #f8f9fa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: #495057;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+            color: #212529;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            transform: translateX(-5px);
+        }
+
+        .option.selected {
+            background: #e7f1ff;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .option-letter {
+            background: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter {
+            background: #667eea;
+            color: white;
+        }
+
+        .option.correct .option-letter {
+            background: #28a745;
+            color: white;
+        }
+
+        .option.incorrect .option-letter {
+            background: #dc3545;
+            color: white;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1.05em;
+            line-height: 1.5;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border-right: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border-right: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-prev {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-check:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .final-score {
+            text-align: center;
+            padding: 60px 40px;
+            display: none;
+        }
+
+        .final-score.show {
+            display: block;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .score-details {
+            font-size: 1.3em;
+            color: #495057;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .question-container {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 1.1em;
+            }
+
+            .buttons-container {
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .icon {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 מבחן מערכות תפעול ושירות</h1>
+            <p>100 שאלות אמריקאיות + 20 שאלות נכון/לא נכון</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">שאלה 1 מתוך 120</div>
+        </div>
+
+        <div class="question-container" id="questionContainer">
+            <div class="question-header">
+                <span class="question-number" id="questionNumber">שאלה 1</span>
+                <span class="question-type" id="questionType">בחירה מרובה</span>
+            </div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="feedback" id="feedback">
+                <div class="feedback-title" id="feedbackTitle"></div>
+                <div id="feedbackText"></div>
+            </div>
+        </div>
+
+        <div class="final-score" id="finalScore">
+            <h2 style="margin-bottom: 30px; font-size: 2em; color: #212529;">🎉 סיימת את המבחן!</h2>
+            <div class="score-circle" id="scoreCircle"></div>
+            <div class="score-details" id="scoreDetails"></div>
+            <button class="btn btn-restart" onclick="restartExam()">התחל מחדש</button>
+        </div>
+
+        <div class="buttons-container" id="buttonsContainer">
+            <button class="btn btn-prev" id="btnPrev" onclick="previousQuestion()">← הקודם</button>
+            <button class="btn btn-check" id="btnCheck" onclick="checkAnswer()">בדוק תשובה</button>
+            <button class="btn btn-next" id="btnNext" onclick="nextQuestion()" style="display: none;">הבא →</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // שאלות אמריקאיות 1-100
+            {
+                question: "מהו המרכיב המשמעותי ביותר בעלויות השינוע של חומרי גלם בתוך רצפת ייצור במכונות גדולות?",
+                options: [
+                    "עלויות השינוע מהוות 75%-30% מעלויות המוצר",
+                    "עלויות השינוע מהוות 50%-20% מעלויות המוצר",
+                    "עלויות השינוע מהוות 90%-80% מעלויות המוצר",
+                    "עלויות השינוע מהוות 15%-10% מעלויות המוצר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "באיזה תדירות בממוצע משנים חברות את רצפת הייצור שלהן?",
+                options: [
+                    "כל 3 שנים",
+                    "כל שנה",
+                    "כל 5 שנים",
+                    "כל 10 שנים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה מהבאים אינו שיקול מרכזי בתכנון מערך תפעול?",
+                options: [
+                    "צבע קירות המפעל",
+                    "מזעור עלויות שינוע",
+                    "הקטנת מלאי בתהליך",
+                    "שיפור ניצולת וזמינות ציודים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי טכנולוגיית JIT (Just In Time)?",
+                options: [
+                    "שיטת ניהול יפנית למזעור מלאי בתהליך",
+                    "מערכת אוטומטית לניהול תחזוקה",
+                    "טכנולוגיה לזיהוי ברקודים",
+                    "שיטה לתכנון רצפת ייצור"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם שלושת רמות התכנון בניהול תפעול?",
+                options: [
+                    "אסטרטגי, טקטי, תפעולי",
+                    "גבוה, בינוני, נמוך",
+                    "ראשוני, משני, שלישוני",
+                    "מקומי, אזורי, לאומי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו מהאמירות הבאות נכונה לגבי עלות השינוי בתכנון?",
+                options: [
+                    "ככל שמתקדמים ביישום התכניות, עלות השינוי גדלה באופן משמעותי",
+                    "עלות השינוי קבועה בכל שלבי התכנון",
+                    "עלות השינוי יורדת ככל שמתקדמים בפרויקט",
+                    "אין קשר בין שלב התכנון לעלות השינוי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו ERP?",
+                options: [
+                    "Enterprise Resource Planning - ניהול אינטגרטיבי של משאבים",
+                    "Emergency Response Protocol - פרוטוקול תגובה לחירום",
+                    "Electronic Resource Processing - עיבוד משאבים אלקטרוני",
+                    "Efficient Resource Production - ייצור יעיל של משאבים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "באיזה אחוז נע טווח המלאי המומלץ בשיטת JIT?",
+                options: [
+                    "15%-20%",
+                    "30%-40%",
+                    "5%-10%",
+                    "50%-60%"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי גישת Agile בתכנון רצפת ייצור?",
+                options: [
+                    "גמישות לשינויים עתידיים בתנאי אי וודאות",
+                    "תכנון קשיח וקבוע מראש",
+                    "עבודה עם ספק יחיד",
+                    "מזעור כוח אדם"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו ROI בהקשר של ניצולת מכונות?",
+                options: [
+                    "החזר על השקעה (Return On Investment)",
+                    "Rate Of Innovation - קצב חדשנות",
+                    "Resource Optimization Index - מדד אופטימיזציה",
+                    "Reliability Operation Indicator - מדד תפעול אמינות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו ההבדל העיקרי בין מרחקים מלבניים למרחקים אוקלידיים בתכנון מערך?",
+                options: [
+                    "מרחקים מלבניים נעים בשטיב הערב, אוקלידיים בדרך ישירה",
+                    "מרחקים מלבניים זולים יותר מאוקלידיים",
+                    "מרחקים אוקלידיים גמישים יותר לשינויים",
+                    "אין הבדל משמעותי ביניהם"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה מהבאים הוא גורם עיקרי למה לשנות מערך קיים?",
+                options: [
+                    "כל התשובות נכונות",
+                    "חדשנות טכנולוגית",
+                    "גידול בביקושים",
+                    "בעיות בטיחות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי המטרה העיקרית של תכנון קיבולת?",
+                options: [
+                    "תכנון המשאבים הדרושים למפעל לעמידה בקיבולת הנדרשת",
+                    "הגדלת שטח המפעל",
+                    "הפחתת מספר עובדים",
+                    "הגדלת מלאי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "באיזו תדירות בערך חברות מעדכנות את רצפת הייצור שלהן?",
+                options: [
+                    "כל 3 שנים",
+                    "כל חצי שנה",
+                    "כל 7 שנים",
+                    "פעם ב-10 שנים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Clearance בהקשר של תכנון מערך?",
+                options: [
+                    "השארת מקום פנוי ליד מכונות לביצוע תחזוקה",
+                    "ניקוי רצפת הייצור",
+                    "אישור בטיחותי",
+                    "מרווח בין משמרות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם שלושת סוגי המערכות העיקריים שהקורס דן בהם?",
+                options: [
+                    "מערכות ייצור, אחסון ושירות",
+                    "מערכות מכירה, שיווק וייצור",
+                    "מערכות ניהול, כספים ותפעול",
+                    "מערכות אנרגיה, מים ותקשורת"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Fixed Layout?",
+                options: [
+                    "מערך שבו המוצר נשאר במקום קבוע וחומרי הגלם מגיעים אליו",
+                    "מערך של מכונות קבועות ללא אפשרות שינוי",
+                    "מערך שמשמש רק לפרויקטים קצרים",
+                    "מערך זמני לתהליכי בנייה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו המאפיין העיקרי של מערך תהליך (Process Layout)?",
+                options: [
+                    "מגוון מוצרים גדול, נפח ייצור קטן",
+                    "מגוון מוצרים קטן, נפח ייצור גדול",
+                    "מגוון ונפח שווים",
+                    "אין מגוון כלל"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו היתרון המרכזי של מערך תהליך?",
+                options: [
+                    "גמישות גבוהה ויכולת לייצר מגוון רחב",
+                    "עלויות נמוכות",
+                    "זמני ייצור קצרים",
+                    "פשטות בניהול"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו החיסרון המרכזי של מערך תהליך?",
+                options: [
+                    "המון מלאי על הרצפה עם עלות גבוהה",
+                    "חוסר גמישות",
+                    "נצילות נמוכה של עובדים",
+                    "קושי בגיוס עובדים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו המאפיין העיקרי של מערך מוצר (Product Layout)?",
+                options: [
+                    "מגוון מוצרים קטן, נפח ייצור גדול",
+                    "מגוון מוצרים גדול, נפח ייצור קטן",
+                    "גמישות מקסימלית",
+                    "עלויות שינוע גבוהות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו היתרון המרכזי של מערך מוצר?",
+                options: [
+                    "פשטות שינוע, עלויות נמוכות וקביעת Due Date מדוייקת",
+                    "גמישות לשינויים",
+                    "יכולת לייצר מגוון רחב",
+                    "עלויות ציוד נמוכות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו החיסרון המרכזי של מערך מוצר?",
+                options: [
+                    "סיכון ליצירת צוואר בקבוק אם מכונה תקולה",
+                    "עלויות גבוהות",
+                    "קושי בניהול",
+                    "דרישה לעובדים מיומנים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו מערך קבוצות (Group Layout)?",
+                options: [
+                    "שילוב של מערך תהליך ומערך מוצר",
+                    "מערך המתמחה במוצר אחד",
+                    "מערך זמני",
+                    "מערך למוצרים גדולים בלבד"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה סוג מערך דורש מכונות עם אמינות גבוהה במיוחד?",
+                options: [
+                    "מערך מוצר",
+                    "מערך תהליך",
+                    "מערך קבוצות",
+                    "מערך קבוע"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי גישת Centralized Maintenance?",
+                options: [
+                    "תחזוקה ברמת סמנכ\"ל עם השפעה על כל הארגון",
+                    "תחזוקה ברמת קבוצת ייצור",
+                    "תחזוקה חיצונית",
+                    "תחזוקה אוטומטית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי גישת Decentralized Maintenance?",
+                options: [
+                    "תחזוקה כפופה לכל קבוצת ייצור בנפרד",
+                    "תחזוקה מרכזית",
+                    "תחזוקה ממוחשבת",
+                    "תחזוקה חיצונית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Cross Docking?",
+                options: [
+                    "הפצת סחורה ללא אחסון ביניים, ישירות מ-Receiving ל-Shipping",
+                    "שיטת אחסון מיוחדת",
+                    "סוג של מלגזה",
+                    "מערכת ניהול מלאי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "כמה אחוז מהלקוחות בשוק הקמעונאי הם רשתות גדולות?",
+                options: [
+                    "60%",
+                    "40%",
+                    "80%",
+                    "25%"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה סוג לקוחות מקבל בעיקר משטחים שלמים של סחורה?",
+                options: [
+                    "רשתות גדולות (שופרסל, מגה וכדומה)",
+                    "שוק פרטי",
+                    "שוק מוסדי",
+                    "יצואנים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם שני סוגי המדדים העיקריים לקביעת מיקום מחלקות במערך?",
+                options: [
+                    "מדדים כמותיים ומדדים איכותיים",
+                    "מדדים פיזיים ומדדים כלכליים",
+                    "מדדים זמניים ומדדים מרחביים",
+                    "מדדים טכניים ומדדים אנושיים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו תרשים זיקות (Relationship Chart)?",
+                options: [
+                    "תרשים המציג את עוצמת הקשר/שינוע בין ישויות שונות",
+                    "תרשים היררכי של הארגון",
+                    "תרשים זרימת מלאי",
+                    "תרשים תקציבי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מה משמעות האות 'A' בתרשים זיקות?",
+                options: [
+                    "Absolutely Necessary - חיוני לחלוטין",
+                    "Acceptable - מקובל",
+                    "Advanced - מתקדם",
+                    "Automatic - אוטומטי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מה משמעות האות 'X' בתרשים זיקות?",
+                options: [
+                    "Undesirable - בלתי רצוי",
+                    "Extra - נוסף",
+                    "Extreme - קיצוני",
+                    "Exit - יציאה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו DFM (Design for Manufacturing)?",
+                options: [
+                    "גישה לפישוט תהליך הייצור תוך שמירה על איכות המוצר",
+                    "תכנון מערכת ייצור",
+                    "שיטת ניהול איכות",
+                    "תקן בינלאומי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו טכנולוגיה מאפשרת לאחד תהליכי עיבוד ולקצר זמני ייצור?",
+                options: [
+                    "מדפסות תלת-מימד",
+                    "רובוטים",
+                    "מערכות CAD",
+                    "מערכות ERP"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Flow Pattern במערכי ייצור?",
+                options: [
+                    "דפוס הזרימה של חומרי גלם בתהליך",
+                    "תבנית עיצוב המוצר",
+                    "שיטת ניהול פרויקטים",
+                    "סוג של מערכת שינוע"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה סוג זרימה מועדף בתכנון מערך?",
+                options: [
+                    "זרימה לינארית",
+                    "זרימה צולבת",
+                    "זרימה מעגלית",
+                    "זרימה אקראית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם מרכיבי עלויות מחסן?",
+                options: [
+                    "כל התשובות נכונות",
+                    "עלות הקמה ותחזוקה",
+                    "עלויות שינוע",
+                    "עלויות כוח אדם"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו WMS?",
+                options: [
+                    "Warehouse Management Systems - מערכת לניהול מחסן",
+                    "Work Management Software - תוכנה לניהול עבודה",
+                    "Worker Monitoring System - מערכת ניטור עובדים",
+                    "Workflow Management Suite - חבילת ניהול תהליכים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו AutoID?",
+                options: [
+                    "שם כולל לטכנולוגיות זיהוי אוטומטי במחסנים",
+                    "מערכת זיהוי רכבים",
+                    "תוכנה לניהול מלאי",
+                    "סוג של ברקוד"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו חברה דרשה ב-80' מספקיה לעבוד בשיטת AutoID?",
+                options: [
+                    "וולמארט (Walmart)",
+                    "אמזון (Amazon)",
+                    "טסקו (Tesco)",
+                    "קוסטקו (Costco)"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "כמה תווים מכיל ברקוד לינארי סטנדרטי?",
+                options: [
+                    "128 תווים",
+                    "64 תווים",
+                    "256 תווים",
+                    "94 תווים"
+                ],
+                correct: 3,
+                type: "multiple"
+            },
+            {
+                question: "מהו QR Code?",
+                options: [
+                    "Quick Response - ברקוד דו-מימדי",
+                    "Quality Recognition - זיהוי איכות",
+                    "Quantum Reader - קורא קוונטי",
+                    "Quick Registration - רישום מהיר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו היתרון המרכזי של QR על פני ברקוד לינארי?",
+                options: [
+                    "מהירות שליפה גבוהה יותר וכמות מידע גדולה יותר",
+                    "זול יותר",
+                    "קל יותר להדפסה",
+                    "עמיד יותר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו RFID?",
+                options: [
+                    "Radio Frequency ID - זיהוי על פי תדרי רדיו",
+                    "Rapid Frequency Identification - זיהוי תדר מהיר",
+                    "Remote File ID - זיהוי קובץ מרוחק",
+                    "Real-time Facility Indicator - מחוון מתקן בזמן אמת"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מי פיתח את טכנולוגיית ה-RFID ומתי?",
+                options: [
+                    "חיל האוויר האמריקאי במלחמת העולם השנייה",
+                    "נאס\"א בשנות ה-60",
+                    "IBM בשנות ה-70",
+                    "גוגל בשנות ה-2000"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו ההבדל בין תג RFID אקטיבי לפסיבי?",
+                options: [
+                    "אקטיבי משדר מידע, פסיבי ניתן רק לקריאה",
+                    "אקטיבי יקר יותר בלבד",
+                    "פסיבי עמיד יותר",
+                    "אין הבדל מהותי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו OCR?",
+                options: [
+                    "Optical Character Recognition - זיהוי תווים אופטי",
+                    "Online Content Reader - קורא תוכן מקוון",
+                    "Operational Control Room - חדר בקרה תפעולי",
+                    "Output Correction Routine - שגרת תיקון פלט"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו RAMS?",
+                options: [
+                    "Reliability, Availability, Maintainability, Supportability",
+                    "Resource Allocation Management System",
+                    "Rapid Action Monitoring Software",
+                    "Real-time Asset Monitoring Service"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי הגדרת Availability (זמינות)?",
+                options: [
+                    "הזמן שהמכונה זמינה לייצור",
+                    "מספר המכונות הזמינות",
+                    "מספר העובדים הזמינים",
+                    "כמות חומר הגלם הזמין"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי הגדרת Reliability (אמינות)?",
+                options: [
+                    "ההסתברות שמרכיב יתפקד תקין ללא כשל בפרק זמן מסוים",
+                    "מספר הכשלים בשנה",
+                    "זמן התיקון הממוצע",
+                    "עלות התחזוקה השנתית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו MTBF?",
+                options: [
+                    "Mean Time Between Failure - זמן ממוצע בין כשלים",
+                    "Maximum Time Before Failure - זמן מקסימלי לפני כשל",
+                    "Minimum Time Between Fixes - זמן מינימלי בין תיקונים",
+                    "Mean Total Break Frequency - תדירות שבר כוללת ממוצעת"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו MTTR?",
+                options: [
+                    "Mean Time To Repair - זמן ממוצע לתיקון",
+                    "Maximum Time To Replace - זמן מקסימלי להחלפה",
+                    "Minimum Time To Restart - זמן מינימלי לאתחול",
+                    "Mean Total Time Required - זמן כולל ממוצע נדרש"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו MTTS?",
+                options: [
+                    "Mean Time To Support - זמן ממוצע מזיהוי כשל להתחלת תחזוקה",
+                    "Maximum Time To Service - זמן מקסימלי לשירות",
+                    "Minimum Time To Start - זמן מינימלי להפעלה",
+                    "Mean Total Time Spent - זמן כולל ממוצע שהושקע"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם שלושת חלקי עקום האמבט באמינות?",
+                options: [
+                    "בעיות לידה, תקופה יציבה, בלאי",
+                    "התחלה, אמצע, סוף",
+                    "תכנון, ביצוע, סיום",
+                    "קנייה, התקנה, תחזוקה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו תקופה בעקום האמבט יש את שיעור הכשלים הנמוך ביותר?",
+                options: [
+                    "התקופה היציבה (אמצע העקום)",
+                    "בעיות הלידה (תחילת העקום)",
+                    "תקופת הבלאי (סוף העקום)",
+                    "כל התקופות שוות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איך מחשבים אמינות של מערכת טורית?",
+                options: [
+                    "מכפלת האמינויות של כל הרכיבים",
+                    "סכום האמינויות",
+                    "ממוצע האמינויות",
+                    "האמינות המקסימלית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איך מחשבים אמינות של מערכת מקבילית?",
+                options: [
+                    "1 פחות מכפלת (1 פחות האמינויות)",
+                    "סכום האמינויות",
+                    "מכפלת האמינויות",
+                    "ממוצע האמינויות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי תחזוקה מונעת (Preventive Maintenance)?",
+                options: [
+                    "תחזוקה מתוכננת מראש לפני קרות כשל",
+                    "תחזוקה לאחר כשל",
+                    "תחזוקה יומית",
+                    "תחזוקה חיצונית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי תחזוקת שבר (Breakdown Maintenance)?",
+                options: [
+                    "טיפול במערכת רק לאחר שהתרחש כשל",
+                    "תחזוקה מתוכננת",
+                    "תחזוקה יומית",
+                    "תחזוקה מבוססת זמן"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי Condition-based Maintenance?",
+                options: [
+                    "ניטור מתמשך של רכיבים וקבלת החלטות לפי מצבם",
+                    "תחזוקה לפי לוח זמנים",
+                    "תחזוקה אחרי כשל",
+                    "תחזוקה שבועית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי Predictive Maintenance?",
+                options: [
+                    "אנליזה סטטיסטית של דאטה היסטורי לחיזוי כשלים",
+                    "תחזוקה אקראית",
+                    "תחזוקה יומית",
+                    "תחזוקה לפי תחושת בטן"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי Design-out Maintenance?",
+                options: [
+                    "עיצוב רכיבים שלא דורשים תחזוקה כלל",
+                    "תחזוקה מחוץ לאתר",
+                    "תחזוקה מינימלית",
+                    "תחזוקה אסתטית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי Opportunity-based Maintenance?",
+                options: [
+                    "ביצוע תחזוקה בזמנים שהמכונה לא נדרשת (כמו חגים)",
+                    "תחזוקה מיידית",
+                    "תחזוקה שבועית",
+                    "תחזוקה חודשית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו היחס בין יעילות טכנאי בתחזוקת שבר לתחזוקה מונעת?",
+                options: [
+                    "רבע מהיעילות",
+                    "חצי מהיעילות",
+                    "אותה יעילות",
+                    "כפולה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Root Cause Analysis?",
+                options: [
+                    "ניתוח לאיתור הסיבה השורשית לכשל",
+                    "ניתוח כלכלי",
+                    "ניתוח סטטיסטי",
+                    "ניתוח שוק"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי שיטת ה-5 Whys?",
+                options: [
+                    "שאילת 5 שאלות 'למה' להגעה לסיבה שורשית",
+                    "5 שיטות תחזוקה",
+                    "5 סוגי כשלים",
+                    "5 רמות ניהול"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי שיטת Fishbone לניתוח כשלים?",
+                options: [
+                    "ניתוח לפי 6 מרכיבים: אנשים, שיטות, מדידה, ציוד, סביבה, חומרים",
+                    "ניתוח גרפי פשוט",
+                    "ניתוח מספרי",
+                    "ניתוח כלכלי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי שיטת Pareto Analysis?",
+                options: [
+                    "20% מהפעולות אחראיות ל-80% מהערך",
+                    "50-50 בין סיבות",
+                    "כל הסיבות שוות",
+                    "10% אחראיות ל-90%"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו מודל הגבינה השוויצרית?",
+                options: [
+                    "בניית שכבות הגנה למניעת התפתחות כשל",
+                    "שיטת אחסון",
+                    "מודל ארגוני",
+                    "שיטת ניהול כספים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהן שלוש רמות ניהול התחזוקה?",
+                options: [
+                    "אסטרטגית, טקטית, תפעולית",
+                    "גבוהה, בינונית, נמוכה",
+                    "מרכזית, מקומית, חיצונית",
+                    "יומית, שבועית, חודשית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו CMMS?",
+                options: [
+                    "מערכת מידע לניהול תחזוקה",
+                    "תוכנה לעיצוב",
+                    "מערכת ניהול לקוחות",
+                    "תוכנת חשבונאות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם יתרונות מיקור חוץ בתחזוקה?",
+                options: [
+                    "זול יותר, אין צורך בהכשרה פנימית",
+                    "שליטה מלאה",
+                    "שמירת ידע בארגון",
+                    "גמישות מקסימלית"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהם חסרונות מיקור חוץ בתחזוקה?",
+                options: [
+                    "פחות אחריות של עובדים, תלות בספק",
+                    "יקר יותר תמיד",
+                    "מורכב מדי",
+                    "דורש הכשרה רבה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו SLA במיקור חוץ?",
+                options: [
+                    "Service Level Agreement - הסכם רמת שירות",
+                    "Standard Labor Agreement - הסכם עבודה סטנדרטי",
+                    "Support Level Assessment - הערכת רמת תמיכה",
+                    "Service License Approval - אישור רישיון שירות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי טכנולוגיית קבוצות (Group Technology)?",
+                options: [
+                    "חלוקת רצפת ייצור לאזורים הומוגניים",
+                    "עבודת צוות",
+                    "ניהול פרויקטים",
+                    "שיטת לימוד"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו PLM?",
+                options: [
+                    "Product Lifecycle Management - ניהול מחזור חיי מוצר",
+                    "Production Line Management - ניהול קו ייצור",
+                    "Project Leadership Model - מודל הנהגת פרויקט",
+                    "Process Level Monitoring - ניטור ברמת תהליך"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזה מהבאים הוא גורם למיקום מפעל?",
+                options: [
+                    "כל התשובות נכונות",
+                    "מיקום לקוחות",
+                    "סמיכות לחומרי גלם",
+                    "זמינות כוח אדם"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי מטריצת From-To?",
+                options: [
+                    "מטריצה המציגה זרימה/מרחקים בין ישויות",
+                    "מטריצת החלטות",
+                    "מטריצת עלויות",
+                    "מטריצת סיכונים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו זרימה נגדית (Backflow)?",
+                options: [
+                    "חומר שחוזר אחורה בתהליך הייצור",
+                    "זרימה מהירה",
+                    "זרימה איטית",
+                    "זרימה רציפה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו אלגוריתם ALDEP?",
+                options: [
+                    "Automated Layout Design Procedure - בניית מערך לפי זיקות",
+                    "Advanced Layout Development Program - תוכנית פיתוח מתקדם",
+                    "Automatic Line Design Process - תהליך עיצוב קו אוטומטי",
+                    "Asset Location Decision Plan - תכנית החלטת מיקום נכסים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו אלגוריתם CRAFT?",
+                options: [
+                    "אלגוריתם שיפור מערך קיים על ידי החלפת מחלקות",
+                    "אלגוריתם בניה",
+                    "אלגוריתם תכנון",
+                    "אלגוריתם אופטימיזציה כללי"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Single Row Layout Problem?",
+                options: [
+                    "בעיית תכנון מערך בשורה אחת",
+                    "בעיה במערך תהליך",
+                    "בעיה במערך מוצר",
+                    "בעיה במערך קבוצות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Multi-Row Layout Problem?",
+                options: [
+                    "בעיית תכנון מערך דו-מימדי",
+                    "בעיה במספר מפעלים",
+                    "בעיה במספר משמרות",
+                    "בעיה במספר מוצרים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו MST (Modified Spanning Tree)?",
+                options: [
+                    "אלגוריתם לתכנון מערך שורה בודדת",
+                    "שיטת ניהול פרויקטים",
+                    "מודל אופטימיזציה",
+                    "שיטת ניתוח נתונים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו CORELAP?",
+                options: [
+                    "אלגוריתם בניה מבוסס יחסי קרבה איכותיים",
+                    "תוכנת עיצוב",
+                    "מערכת ניהול",
+                    "כלי אנליזה"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו TCR ב-CORELAP?",
+                options: [
+                    "Total Closeness Rating - סכום ערכי יחסי קרבה",
+                    "Total Cost Ratio - יחס עלות כולל",
+                    "Technical Control Rating - דירוג בקרה טכנית",
+                    "Time Calculation Result - תוצאת חישוב זמן"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Participatory Team בניתוח סיבתיות?",
+                options: [
+                    "צוות רב-תחומי לסיעור מוחות ללא אילוצים",
+                    "צוות ניהול",
+                    "צוות תחזוקה",
+                    "צוות בקרת איכות"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו מהאמירות הבאות נכונה לגבי תכנון קיבולת?",
+                options: [
+                    "מתחשבים בהפסדי תפוקה צפויים כמו פחת ונצילות",
+                    "מתכננים רק לפי ביקוש מקסימלי",
+                    "לא לוקחים בחשבון עונתיות",
+                    "מתעלמים מזמינות חומרי גלם"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Gap בהקשר של זמינות מכונה?",
+                options: [
+                    "הזמן שהמכונה ב-DOWN בגלל תחזוקה, טעינה וכדומה",
+                    "המרווח בין שתי מכונות",
+                    "הפרש בין תכנון למציאות",
+                    "זמן ההפסקה של עובדים"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי הדרך לשפר MTBF?",
+                options: [
+                    "כל התשובות נכונות",
+                    "שימוש בחלקי חילוף איכותיים",
+                    "הוספת יתירות",
+                    "תחזוקה מונעת טובה יותר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו BFR?",
+                options: [
+                    "Product Failure Rate - שיעור כשל פר מוצר",
+                    "Base Failure Rating - דירוג כשל בסיסי",
+                    "Business Failure Risk - סיכון כשל עסקי",
+                    "Break Frequency Rate - קצב תדירות שבר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איך מחשבים MTBF מ-BFR?",
+                options: [
+                    "1 חלקי BFR",
+                    "BFR כפול 2",
+                    "100 חלקי BFR",
+                    "BFR בריבוע"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהו Contributing Cause?",
+                options: [
+                    "גורם תורם לכשל אך לא הסיבה העיקרית",
+                    "הסיבה השורשית",
+                    "גורם משני",
+                    "גורם חיצוני"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "איזו מהשיטות הבאות לא נכללת בשיטות התחזוקה המונעת?",
+                options: [
+                    "Run-to-failure",
+                    "Time-based",
+                    "Condition-based",
+                    "Predictive"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי הסיבה העיקרית לכך שמחסן נחשב ל'רע הכרחי'?",
+                options: [
+                    "יש לו עלויות רבות אך הוא הכרחי לתפעול",
+                    "הוא תופס מקום",
+                    "הוא דורש עובדים",
+                    "הוא מסובך לניהול"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "מהי המשמעות של 'זרימה לינארית' במערך מוצר?",
+                options: [
+                    "חומר הגלם עובר בקו ישר דרך תחנות העבודה",
+                    "המוצר נע במעגל",
+                    "המוצר קופץ בין תחנות",
+                    "אין מסלול מוגדר"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            {
+                question: "למה חשוב Clearance ליד מכונות?",
+                options: [
+                    "כדי לאפשר גישה לביצוע תחזוקה",
+                    "כדי לחסוך מקום",
+                    "כדי להפריד בין עובדים",
+                    "כדי לשפר אוורור"
+                ],
+                correct: 0,
+                type: "multiple"
+            },
+            // שאלות נכון/לא נכון 101-120
+            {
+                question: "ייצור תופס מרכיב משמעותי בתשואות של מדינות וחברות.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "תכנון טווח ארוך (אסטרטגי) כולל שיבוץ וזימון יומי.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "עלות השינוי יורדת ככל שמתקדמים ביישום תכניות במפעל.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "מערך תהליך מאפיין במגוון מוצרים גדול ונפח ייצור קטן.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "מערך מוצר רגיש מאוד לכשלים במכונות בגלל סכנת צוואר בקבוק.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "במערך תהליך, אם מכונה קורסת אפשר להעביר את המוצר למכונה זהה אחרת.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "Cross Docking הוא תהליך של אחסון ארוך טווח במחסן.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "60% מהלקוחות בשוק הקמעונאי הם רשתות גדולות.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "האות X בתרשים זיקות מסמנת קשר רצוי מאוד.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "QR Code מכיל פחות מידע מברקוד לינארי.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "RFID פותח על ידי חיל האוויר האמריקאי במלחמת העולם השנייה.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "תג RFID פסיבי יכול לשדר מידע באופן אקטיבי.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "MTBF מודד את הזמן הממוצע לתיקון כשל.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "בעקום האמבט, התקופה היציבה מאופיינת בשיעור כשלים נמוך.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "אמינות מערכת טורית גבוהה יותר ממערכת מקבילית.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "תחזוקה מונעת מתבצעת רק לאחר שקרה כשל.",
+                options: ["נכון", "לא נכון"],
+                correct: 1,
+                type: "tf"
+            },
+            {
+                question: "יעילות טכנאי בתחזוקת שבר היא כרבע מיעילותו בתחזוקה מונעת.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "שיטת ה-5 Whys פותחה על ידי חברת טויוטה.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "Fishbone Diagram משתמש ב-6 מרכיבים לניתוח כשלים.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            },
+            {
+                question: "ניתוח Pareto אומר ש-20% מהפעולות אחראיות ל-80% מהערך.",
+                options: ["נכון", "לא נכון"],
+                correct: 0,
+                type: "tf"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let checkedQuestions = new Array(questions.length).fill(false);
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            
+            document.getElementById('questionNumber').textContent = `שאלה ${currentQuestion + 1}`;
+            document.getElementById('questionType').textContent = q.type === 'multiple' ? 'בחירה מרובה' : 'נכון / לא נכון';
+            document.getElementById('questionText').textContent = q.question;
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                if (userAnswers[currentQuestion] === index) {
+                    optionDiv.classList.add('selected');
+                }
+                
+                if (checkedQuestions[currentQuestion]) {
+                    optionDiv.style.pointerEvents = 'none';
+                    if (index === q.correct) {
+                        optionDiv.classList.add('correct');
+                    } else if (userAnswers[currentQuestion] === index) {
+                        optionDiv.classList.add('incorrect');
+                    }
+                }
+                
+                optionDiv.onclick = () => selectOption(index);
+                
+                optionDiv.innerHTML = `
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            const feedback = document.getElementById('feedback');
+            if (checkedQuestions[currentQuestion]) {
+                feedback.classList.add('show');
+                if (userAnswers[currentQuestion] === q.correct) {
+                    feedback.className = 'feedback show correct';
+                    document.getElementById('feedbackTitle').innerHTML = '<span class="icon">✓</span> תשובה נכונה!';
+                    document.getElementById('feedbackText').textContent = 'כל הכבוד! המשך כך.';
+                } else {
+                    feedback.className = 'feedback show incorrect';
+                    document.getElementById('feedbackTitle').innerHTML = '<span class="icon">✗</span> תשובה שגויה';
+                    document.getElementById('feedbackText').textContent = `התשובה הנכונה היא: ${q.options[q.correct]}`;
+                }
+            } else {
+                feedback.classList.remove('show');
+            }
+            
+            updateButtons();
+            updateProgress();
+        }
+
+        function selectOption(index) {
+            if (checkedQuestions[currentQuestion]) return;
+            
+            userAnswers[currentQuestion] = index;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                opt.classList.remove('selected');
+                if (i === index) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            document.getElementById('btnCheck').disabled = false;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === null) return;
+            
+            checkedQuestions[currentQuestion] = true;
+            const q = questions[currentQuestion];
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            loadQuestion();
+            
+            document.getElementById('btnCheck').style.display = 'none';
+            document.getElementById('btnNext').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function updateButtons() {
+            document.getElementById('btnPrev').disabled = currentQuestion === 0;
+            
+            if (checkedQuestions[currentQuestion]) {
+                document.getElementById('btnCheck').style.display = 'none';
+                document.getElementById('btnNext').style.display = 'block';
+                document.getElementById('btnNext').disabled = false;
+            } else {
+                document.getElementById('btnCheck').style.display = 'block';
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('btnCheck').disabled = userAnswers[currentQuestion] === null;
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `שאלה ${currentQuestion + 1} מתוך ${questions.length}`;
+        }
+
+        function showFinalScore() {
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('buttonsContainer').style.display = 'none';
+            document.getElementById('finalScore').classList.add('show');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('scoreCircle').textContent = percentage + '%';
+            
+            let message = '';
+            if (percentage >= 90) {
+                message = '🌟 מעולה! ';
+            } else if (percentage >= 80) {
+                message = '👏 טוב מאוד! ';
+            } else if (percentage >= 70) {
+                message = '👍 יפה! ';
+            } else if (percentage >= 60) {
+                message = '💪 בסדר, אפשר לשפר. ';
+            } else {
+                message = '📚 מומלץ ללמוד שוב את החומר. ';
+            }
+            
+            document.getElementById('scoreDetails').innerHTML = `
+                ${message}<br>
+                <strong>ענית נכון על ${score} שאלות מתוך ${questions.length}</strong><br>
+                ציון: ${percentage}%
+            `;
+        }
+
+        function restartExam() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            checkedQuestions = new Array(questions.length).fill(false);
+            
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('buttonsContainer').style.display = 'flex';
+            document.getElementById('finalScore').classList.remove('show');
+            
+            loadQuestion();
+        }
+
+        // Initialize
+        window.onload = () => {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
