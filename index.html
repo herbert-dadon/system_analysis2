@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניתוח מערכות מידע 2 — מדריך הכנה למבחן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F3EC;
+  --paper-2:#FBF8F2;
+  --card:#FFFFFF;
+  --ink:#22403F;          /* deep teal-slate — diagram lines */
+  --ink-soft:#3C5957;
+  --muted:#7A736A;
+  --line:#E4DDD0;
+  --blue:#2E6F8E;         /* diagram blue — primary interactive */
+  --blue-d:#225C77;
+  --sage:#5B8C6E;         /* reveal / answer */
+  --sage-bg:#EAF1EA;
+  --amber:#C8821E;        /* warnings / pitfalls */
+  --amber-bg:#FBF1DF;
+  --blue-bg:#E7F0F4;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(34,64,63,.05),0 6px 22px rgba(34,64,63,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Heebo",system-ui,sans-serif;line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+code,.mono{font-family:"JetBrains Mono",monospace;direction:ltr;unicode-bidi:embed}
+
+/* ---------- layout ---------- */
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+header.hero{
+  background:linear-gradient(160deg,#22403F 0%,#2B514F 60%,#316360 100%);
+  color:#F3EFE6;padding:54px 0 64px;position:relative;overflow:hidden;
+}
+header.hero::after{
+  content:"";position:absolute;inset:0;opacity:.10;pointer-events:none;
+  background-image:radial-gradient(circle at 1px 1px,#fff 1px,transparent 0);
+  background-size:26px 26px;
+}
+.eyebrow{font-size:.8rem;letter-spacing:.22em;font-weight:700;color:#8FC0B6;text-transform:uppercase}
+.hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:900;margin:.3em 0 .15em;line-height:1.08;letter-spacing:-.01em}
+.hero .sub{font-size:1.12rem;color:#CFE0DA;max-width:640px;font-weight:400}
+.hero .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.chip{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);
+  padding:7px 14px;border-radius:999px;font-size:.85rem;font-weight:500}
+.chip b{color:#8FC0B6}
+
+/* progress bar */
+.progwrap{margin-top:26px;max-width:560px}
+.progwrap .lbl{display:flex;justify-content:space-between;font-size:.82rem;color:#BcD;margin-bottom:6px;color:#B7CEC8}
+.progbar{height:9px;background:rgba(255,255,255,.16);border-radius:999px;overflow:hidden}
+.progbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8FC0B6,#C8821E);transition:width .4s ease}
+
+/* sticky nav */
+nav.toc{position:sticky;top:0;z-index:50;background:rgba(247,243,236,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.toc .row{display:flex;gap:6px;overflow-x:auto;padding:11px 0;scrollbar-width:thin}
+nav.toc a{white-space:nowrap;font-size:.86rem;font-weight:600;color:var(--ink-soft);
+  text-decoration:none;padding:7px 13px;border-radius:999px;border:1px solid transparent;transition:.15s}
+nav.toc a:hover{background:#fff;border-color:var(--line)}
+nav.toc a.active{background:var(--ink);color:#fff}
+
+main{padding:40px 0 90px}
+section.part{margin-bottom:18px}
+.part-head{display:flex;align-items:baseline;gap:14px;margin:46px 0 8px}
+.part-num{font-family:"JetBrains Mono";font-weight:600;font-size:.95rem;color:var(--blue);
+  border:1.5px solid var(--blue);border-radius:8px;padding:3px 9px;flex:none}
+.part-head h2{font-size:1.7rem;font-weight:800;margin:0;letter-spacing:-.01em}
+.part-intro{color:var(--muted);margin:0 0 14px;max-width:760px}
+
+/* topic accordion */
+.topic{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  margin:12px 0;box-shadow:var(--shadow);overflow:hidden}
+.topic > button.t-head{width:100%;background:none;border:0;cursor:pointer;text-align:right;
+  display:flex;align-items:center;gap:14px;padding:17px 20px;font-family:inherit}
+.t-head:hover{background:var(--paper-2)}
+.t-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);flex:none;
+  display:grid;place-items:center;transition:.15s;background:#fff}
+.t-check.on{background:var(--sage);border-color:var(--sage)}
+.t-check svg{width:13px;height:13px;stroke:#fff;stroke-width:3.4;fill:none;opacity:0;transition:.15s}
+.t-check.on svg{opacity:1}
+.t-title{flex:1;font-size:1.12rem;font-weight:700;color:var(--ink)}
+.t-title small{display:block;font-weight:400;font-size:.85rem;color:var(--muted);margin-top:1px}
+.t-arrow{flex:none;color:var(--muted);transition:.25s}
+.topic.open .t-arrow{transform:rotate(180deg)}
+.t-body{display:none;padding:4px 22px 22px;border-top:1px solid var(--line)}
+.topic.open .t-body{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1}}
+
+.t-body h4{font-size:1.02rem;font-weight:700;margin:18px 0 6px;color:var(--ink)}
+.t-body p{margin:6px 0}
+.t-body ul{margin:6px 0;padding-inline-start:22px}
+.t-body li{margin:4px 0}
+.t-body strong{color:var(--ink)}
+
+/* callouts */
+.note{border-radius:10px;padding:12px 15px;margin:14px 0;font-size:.95rem;border:1px solid}
+.note.pit{background:var(--amber-bg);border-color:#EAD2A4}
+.note.pit::before{content:"⚠ מלכודת מבחן  ";font-weight:800;color:var(--amber)}
+.note.key{background:var(--blue-bg);border-color:#BBD7E2}
+.note.key::before{content:"◆ נקודת מפתח  ";font-weight:800;color:var(--blue-d)}
+.note.tip{background:var(--sage-bg);border-color:#BFD6C5}
+.note.tip::before{content:"✓ טיפ  ";font-weight:800;color:var(--sage)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.93rem;background:#fff;
+  border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--paper-2);font-weight:700;color:var(--ink)}
+tr:last-child td{border-bottom:0}
+td code{font-size:.86rem}
+
+/* svg diagram boxes */
+.dia{display:flex;justify-content:center;background:var(--paper-2);border:1px dashed #cdbfa8;
+  border-radius:10px;padding:16px;margin:14px 0}
+.dia svg{max-width:100%;height:auto}
+.uml-txt{font-family:"JetBrains Mono";font-size:13px;fill:var(--ink)}
+.uml-line{stroke:var(--ink);stroke-width:1.6;fill:none}
+.uml-box{fill:#fff;stroke:var(--ink);stroke-width:1.6}
+
+/* reveal Q */
+.qa{border:1px solid var(--line);border-radius:10px;margin:10px 0;overflow:hidden;background:var(--paper-2)}
+.qa > button{width:100%;text-align:right;background:none;border:0;cursor:pointer;font-family:inherit;
+  padding:12px 15px;font-weight:600;color:var(--ink);display:flex;gap:10px;align-items:center}
+.qa > button::before{content:"?";font-family:"JetBrains Mono";font-weight:600;background:var(--blue);color:#fff;
+  width:24px;height:24px;border-radius:6px;display:grid;place-items:center;flex:none;font-size:.85rem}
+.qa .ans{display:none;padding:0 15px 14px 49px;color:var(--ink-soft);font-size:.95rem;border-top:1px dashed var(--line)}
+.qa.show .ans{display:block;padding-top:12px}
+.qa .ans code{font-size:.85rem}
+
+/* code block */
+pre{background:#1c2e2d;color:#dfeee9;border-radius:10px;padding:14px 16px;overflow-x:auto;
+  font-family:"JetBrains Mono";font-size:.82rem;line-height:1.55;direction:ltr;text-align:left;margin:12px 0}
+pre .c{color:#7fae9b}.pre .k{color:#e0a955}
+
+/* practice cards */
+.prac{background:linear-gradient(160deg,#fff,#FBF8F2);border:1.5px solid #DcCFB8;border-radius:12px;
+  padding:18px 20px;margin:14px 0}
+.prac .tag{display:inline-block;font-size:.74rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--amber);background:var(--amber-bg);padding:3px 10px;border-radius:999px;margin-bottom:8px}
+.prac h4{margin:.2em 0 .4em;font-size:1.05rem}
+.prac .scenario{font-size:.95rem;color:var(--ink-soft)}
+.prac button.sol{margin-top:12px;background:var(--blue);color:#fff;border:0;border-radius:8px;
+  padding:9px 16px;font-family:inherit;font-weight:600;cursor:pointer;font-size:.9rem}
+.prac button.sol:hover{background:var(--blue-d)}
+.prac .solbox{display:none;margin-top:12px;background:var(--sage-bg);border:1px solid #BFD6C5;
+  border-radius:10px;padding:14px 16px;font-size:.93rem}
+.prac.open .solbox{display:block}
+
+/* diagram chooser tool */
+.chooser{background:var(--ink);color:#EAF2EF;border-radius:16px;padding:24px;margin:18px 0}
+.chooser h3{margin:0 0 4px;color:#fff;font-size:1.25rem}
+.chooser p.sm{color:#A7C3BD;margin:0 0 16px;font-size:.9rem}
+.chooser .opts{display:flex;flex-wrap:wrap;gap:8px}
+.chooser .opts button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  color:#EAF2EF;border-radius:999px;padding:9px 15px;font-family:inherit;font-weight:600;cursor:pointer;font-size:.88rem;transition:.15s}
+.chooser .opts button:hover{background:rgba(255,255,255,.16)}
+.chooser .opts button.sel{background:var(--amber);border-color:var(--amber);color:#2a1c00}
+.chooser .result{margin-top:16px;background:rgba(255,255,255,.07);border-radius:12px;padding:16px 18px;display:none}
+.chooser .result.show{display:block;animation:fade .25s}
+.chooser .result b{color:#8FC0B6}
+
+/* plan / timeline */
+.plan{counter-reset:day}
+.day{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px 16px 18px;margin:12px 0;
+  box-shadow:var(--shadow);position:relative;padding-inline-start:64px}
+.day::before{counter-increment:day;content:counter(day);position:absolute;inset-inline-start:16px;top:16px;
+  width:34px;height:34px;background:var(--blue);color:#fff;border-radius:9px;display:grid;place-items:center;
+  font-family:"JetBrains Mono";font-weight:600}
+.day h4{margin:0 0 4px;font-size:1.05rem}
+.day .meta{font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:6px}
+.day ul{margin:6px 0 0;padding-inline-start:20px;font-size:.93rem}
+
+footer{background:var(--ink);color:#A7C3BD;text-align:center;padding:30px 20px;font-size:.85rem}
+footer b{color:#EAF2EF}
+
+@media(max-width:640px){
+  .part-head{flex-direction:row}
+  .t-title{font-size:1.03rem}
+  .day{padding-inline-start:58px}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">הכנה למבחן · חומר פתוח</div>
+    <h1>ניתוח מערכות מידע 2</h1>
+    <p class="sub">כל החומר של הקורס מאורגן לפי נושאים — UML, מונחה-עצמים, מיפוי למסד נתונים ו-Design Patterns — עם הסברים, סימונים, מלכודות מבחן ותרגולים עם פתרון.</p>
+    <div class="chips">
+      <span class="chip">📘 לפי הספר של <b>שובל-פרץ</b></span>
+      <span class="chip">🗂️ <b>5</b> חלקים · <b>14</b> נושאים</span>
+      <span class="chip">✍️ מבוסס על מבני שאלות ממבחני <b>2013</b></span>
+      <span class="chip">🏋️ דוגמת-העוגן: <b>חדר הכושר</b></span>
+    </div>
+    <div class="progwrap">
+      <div class="lbl"><span>התקדמות בלמידה</span><span id="ptxt">0 / 14 נושאים</span></div>
+      <div class="progbar"><i id="pbar"></i></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap"><div class="row" id="tocrow">
+    <a href="#how">איך ללמוד</a>
+    <a href="#p1">א · יסודות OO</a>
+    <a href="#p2">ב · מיפוי DB</a>
+    <a href="#p3">ג · מחלקות מתקדמות</a>
+    <a href="#p4">ד · תרשימי UML</a>
+    <a href="#p5">ה · Design Patterns</a>
+    <a href="#chooser">מצפן התרשים</a>
+    <a href="#plan">תוכנית 10 ימים</a>
+    <a href="#tips">טיפים למבחן</a>
+  </div></div>
+</nav>
+
+<main class="wrap">
+
+<!-- HOW TO STUDY -->
+<section id="how" class="part">
+  <div class="part-head"><span class="part-num">★</span><h2>איך הכי נכון להתכונן</h2></div>
+  <p class="part-intro">המבחן הזה הוא כמעט כולו <strong>יישומי</strong>: נותנים לך תרחיש מילולי (כמו "חדר הכושר") ומבקשים לבנות ממנו סדרת תרשימים — מחלקות, Use-Case, פעילות, מצבים, רצף — ולענות על כמה שאלות מושגיות. לכן הכלל הראשון: <strong>ידע פסיבי לא מספיק, חייבים לתרגל בנייה ביד.</strong></p>
+  <div class="topic open">
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">5 עקרונות עבודה למבחן חומר-פתוח<small>מה שמפריד בין 75 ל-95</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <ul>
+        <li><strong>חומר פתוch ≠ פנאי.</strong> במבחן פתוח אין זמן לחפש מושגים — הדף נועד לאימות נוסחאות וסימונים, לא ללמידה. תכין לעצמך "דף סימונים" מרוכז (קשרים, ריבוי, צורות חצים) שתוכל לסרוק בשנייה.</li>
+        <li><strong>שלוט בזרימת השאלה.</strong> שאלות המבחן בנויות בשרשרת: סעיף 1 תרשים מחלקות (נתונים בלבד) → סעיף תרשים רצף → חזרה לעדכן את תרשים המחלקות עם מחלקות ממשק ובקרה. הכר את הרצף הזה מראש.</li>
+        <li><strong>היצמד לדרישות הטקסט.</strong> כל פונקציה/קשר/מחלקה צריך עוגן במשפט בשאלה. מותר להוסיף פונקציות הגיוניות, אבל קודם כל לכסות את מה שנכתב במפורש.</li>
+        <li><strong>סמן מה שאתה שולף מהטקסט.</strong> תוך כדי קריאה — סמן ישויות (שמות עצם), קשרים (פעלים/"שייך ל"), אילוצי ריבוי ("מספר", "אחד או יותר"), ופונקציות ("יש לאפשר הוספה/עדכון/מחיקה").</li>
+        <li><strong>תרגל את אותה דוגמה בכל התרשימים.</strong> קח תרחיש אחד (חדר כושר / חנות) ובנה עליו את כל סוגי התרשימים. ככה אתה לומד את הקשרים בין התרשימים, וזה בדיוק מה שהמבחן בודק.</li>
+      </ul>
+      <div class="note tip">לכל נושא כאן יש תיבת ✅ — סמן נושא כשאתה מרגיש שאתה יודע לבנות אותו לבד מתרחיש, לא רק להסביר אותו. בראש העמוד תראה את ההתקדמות.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 1 -->
+<section id="p1" class="part">
+  <div class="part-head"><span class="part-num">חלק א</span><h2>יסודות מונחה-עצמים</h2></div>
+  <p class="part-intro">אבני הבניין: עצם, מחלקה, תכונה, מפתח, פונקציה — וחמשת סוגי הקשרים. זה הבסיס שכל שאר התרשימים נשענים עליו.</p>
+
+  <!-- 1.1 -->
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">עצם, מחלקה, תכונה, מפתח, פונקציה<small>אבני היסוד והגדרותיהן המדויקות</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <h4>עצם (Object)</h4>
+      <p>דבר הקיים במציאות — מוחשי או מופשט. ארבעה סוגים: <strong>עצם פיזי</strong> (בניין, ספר), <strong>גוף חי</strong> (סטודנט, עובד), <strong>מושג מופשט/רעיון</strong> (קורס, תעסוקה), <strong>אירוע</strong> (דיווח נוכחות, תנועה בחשבון).</p>
+      <h4>תכונה (Attribute) — 3 סוגים</h4>
+      <table>
+        <tr><th>סוג</th><th>הסבר</th><th>דוגמה</th></tr>
+        <tr><td>פשוטה</td><td>ערך יחיד אטומי</td><td>מספר זיהוי, שם פרטי, ציון</td></tr>
+        <tr><td>מורכבת</td><td>מורכבת מכמה רכיבים</td><td>כתובת = (רחוב, מספר, עיר)</td></tr>
+        <tr><td>"סט" (מרובת-ערכים)</td><td>אוסף ערכים מאותו סוג</td><td>רשימת מספרי טלפון</td></tr>
+      </table>
+      <h4>מחלקה (Class)</h4>
+      <p>אוסף עצמים מאותו סוג — בעלי <strong>אותן תכונות, אותן פונקציות ואותם סוגי קשרים</strong>.</p>
+      <h4>מפתח (Key)</h4>
+      <p>תכונה אחת או יותר המזהה עצם במחלקה באופן <strong>חד-חד-ערכי</strong> (למשל ת"ז לתלמידים).</p>
+      <h4>פונקציות מרכזיות (זכור כ-CRUD)</h4>
+      <ul>
+        <li><strong>הוספה</strong> — יצירת עצם חדש (Add New Employee+)</li>
+        <li><strong>חיפוש/שליפה</strong> — מקבלת מזהה ומאתרת. הבחנה: חיפוש מאשר קיום, שליפה גם מחזירה</li>
+        <li><strong>עדכון/שינוי</strong> — לפי מה שנדרש בשאלה</li>
+        <li><strong>ביטול/מחיקה</strong> — הסרה מהמערכת</li>
+      </ul>
+      <div class="dia">
+        <svg viewBox="0 0 220 150" width="220">
+          <rect class="uml-box" x="40" y="15" width="140" height="120" rx="2"/>
+          <line class="uml-line" x1="40" y1="42" x2="180" y2="42"/>
+          <line class="uml-line" x1="40" y1="95" x2="180" y2="95"/>
+          <text class="uml-txt" x="110" y="33" text-anchor="middle" font-weight="600">Employee</text>
+          <text class="uml-txt" x="48" y="58">- id : key</text>
+          <text class="uml-txt" x="48" y="75">- name</text>
+          <text class="uml-txt" x="48" y="90">- birthDate</text>
+          <text class="uml-txt" x="48" y="112">+ addEmployee()</text>
+          <text class="uml-txt" x="48" y="128">+ update()</text>
+        </svg>
+      </div>
+      <div class="qa"><button onclick="qa(this)">מתי תכונה היא "סט" ולא "מורכבת"?</button>
+        <div class="ans"><strong>מורכבת</strong> = רכיב אחד שמתפרק לתת-שדות שונים (כתובת → רחוב+עיר). <strong>סט</strong> = ריבוי ערכים <em>מאותו סוג</em> (כמה מספרי טלפון). השאלה היא: ערכים שונים זה מזה (מורכבת) או הרבה מאותו דבר (סט).</div></div>
+      <div class="qa"><button onclick="qa(this)">מה הפונקציות שצריך לכתוב במחלקה?</button>
+        <div class="ans">רק הפונקציות הרלוונטיות לדרישות השאלה. אם המערכת צריכה "להוסיף עובד" — מוסיפים <code>+addNewEmployee()</code>. לא ממציאים פונקציות שלא נדרשו, אבל כן מוסיפים את ה-CRUD ההגיוני שהתרחיש מרמז עליו.</div></div>
+    </div>
+  </div>
+
+  <!-- 1.2 relationships -->
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">חמשת סוגי הקשרים<small>אסוציאציה · הקבצה · הרכבה · הורשה · תלות</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>קשר = יחס בעל משמעות (תלות סמנטית) בין מחלקות, מסומן בקו.</p>
+      <table>
+        <tr><th>קשר</th><th>משמעות</th><th>סימון</th><th>זכור ב...</th></tr>
+        <tr><td>אסוציאציה<br>(Association)</td><td>קשר רגיל אפשרי בין עצמים. "ספר נכתב ע"י סופר"</td><td>קו פשוט</td><td>ברירת המחדל</td></tr>
+        <tr><td>הקבצה<br>(Aggregation)</td><td>"חלק מ-" / קשר קטלוגי. לחלק יש זכות קיום עצמאית</td><td>מעוין <strong>חלול</strong> ◇ בצד השלם</td><td>פרופסור שייך למחלקה — אם המחלקה נסגרת, הפרופסור עדיין קיים</td></tr>
+        <tr><td>הרכבה<br>(Composition)</td><td>שלם וחלקיו — יחידה אחת בלתי נפרדת. לחלק <strong>אין</strong> זכות קיום בלי השלם (משך-חיים)</td><td>מעוין <strong>מלא</strong> ◆ בצד השלם</td><td>מעגל מורכב מנקודה — הנקודה לא קיימת בלי המעגל</td></tr>
+        <tr><td>הורשה<br>(Inheritance)</td><td>כללי-ייחודי. מחלקת משנה יורשת תכונות ופונקציות ממחלקת-העל</td><td>חץ <strong>חלול</strong> ▷ כלפי האב</td><td>"is a": Dog is a Mammal</td></tr>
+        <tr><td>תלות<br>(Dependency)</td><td>שימוש זמני — מחלקה אחת משתמשת בשנייה ללא קשר קבוע</td><td>חץ מקווקו</td><td>פחות נפוץ במבחן</td></tr>
+      </table>
+      <div class="dia">
+        <svg viewBox="0 0 460 90" width="460">
+          <!-- aggregation -->
+          <text class="uml-txt" x="55" y="20" text-anchor="middle" font-weight="600">הקבצה</text>
+          <polygon points="20,55 35,48 50,55 35,62" fill="#fff" stroke="#22403F" stroke-width="1.6"/>
+          <line class="uml-line" x1="50" y1="55" x2="95" y2="55"/>
+          <!-- composition -->
+          <text class="uml-txt" x="210" y="20" text-anchor="middle" font-weight="600">הרכבה</text>
+          <polygon points="175,55 190,48 205,55 190,62" fill="#22403F"/>
+          <line class="uml-line" x1="205" y1="55" x2="250" y2="55"/>
+          <!-- inheritance -->
+          <text class="uml-txt" x="380" y="20" text-anchor="middle" font-weight="600">הורשה</text>
+          <polygon points="330,48 330,62 348,55" fill="#fff" stroke="#22403F" stroke-width="1.6"/>
+          <line class="uml-line" x1="348" y1="55" x2="395" y2="55"/>
+        </svg>
+      </div>
+      <div class="note pit">ההבדל בין הקבצה להרכבה הוא שאלת מבחן קלאסית. המבחן: "האם החלק יכול להתקיים בלי השלם?" — כן → הקבצה (מעוין חלול). לא → הרכבה (מעוין מלא). דוגמה: אוניברסיטה↔מחלקה = הקבצה; מעגל↔נקודה = הרכבה.</div>
+      <div class="qa"><button onclick="qa(this)">למה משתמשים בהורשה?</button>
+        <div class="ans">לארגן מחלקות בהיררכיה ולאפשר <strong>שימוש חוזר בקוד</strong>: תכונה/פונקציה משותפת (כמו "צבע" או "הדפס פרטי") מוגדרת פעם אחת במחלקת-העל, ועדכון בה משפיע על כל היורשות. מונע כפילויות.</div></div>
+    </div>
+  </div>
+
+  <!-- 1.3 multiplicity -->
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">אילוצי ריבוי (Multiplicity)<small>1:1 · 1:* · *:* ופירוק רבים-לרבים</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <table>
+        <tr><th>סימון</th><th>משמעות</th><th>דוגמה</th></tr>
+        <tr><td><code>1</code></td><td>בדיוק אחד</td><td>מרצה מלמד קורס אחד בדיוק</td></tr>
+        <tr><td><code>0..1</code></td><td>אפס או אחד (לכל היותר אחד)</td><td>מרצה מלמד קורס אחד לכל היותר</td></tr>
+        <tr><td><code>0..*</code> או <code>*</code></td><td>אפס או יותר</td><td>מרצה מלמד 0 עד אינסוף קורסים</td></tr>
+        <tr><td><code>1..*</code></td><td>אחד או יותר</td><td>מרצה מלמד לפחות קורס אחד</td></tr>
+        <tr><td><code>3..5</code></td><td>תחום מוגדר</td><td>מרצה מלמד 3 עד 5 קורסים</td></tr>
+      </table>
+      <h4>שלושת קשרי הריבוי הבסיסיים</h4>
+      <ul>
+        <li><strong>1:1</strong> (נדיר) — עובד ↔ כרטיס אשראי אחד</li>
+        <li><strong>1:*</strong> (יחיד לרבים) — מחלקה אחת ↔ הרבה סטודנטים</li>
+        <li><strong>*:*</strong> (רבים לרבים) — עובד ↔ פרויקטים</li>
+      </ul>
+      <div class="note key">פירוק רבים-לרבים: כשיש קשר *:* <strong>וצריך לשמור תכונה משותפת</strong> (כמו "ציון" המשותף לסטודנט וקורס) — חייבים מחלקה אמצעית. סטודנט <code>1..*</code> → <strong>ציון</strong> ← <code>*..1</code> קורס. גם קשר *:*:* (שלושה) מתפרק למחלקה אמצעית (לקוח-מכירה-סוכן-מוצר).</div>
+      <div class="qa"><button onclick="qa(this)">איך מזהים בטקסט קשר רבים-לרבים שדורש מחלקה אמצעית?</button>
+        <div class="ans">שני סימנים: (1) הניסוח "כל X ל-מספר Y, וכל Y ל-מספר X"; (2) <strong>קיים נתון ששייך לקשר עצמו</strong>, לא לאחת המחלקות — כמו ציון (שייך לזוג סטודנט-קורס) או "שעות" (שייך לזוג עובד-פרויקט). הנתון הזה חייב לגור במחלקת הקשר.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 2 -->
+<section id="p2" class="part">
+  <div class="part-head"><span class="part-num">חלק ב</span><h2>מיפוי תרשים למסד נתונים</h2></div>
+  <p class="part-intro">תרגום תרשים המחלקות/ERD לטבלאות יחסיות. הלוגיקה זהה לניתוח מ"מ 1 — מפתח ראשי (PK) ומפתח זר (FK).</p>
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">כללי המיפוי לפי סוג הקשר<small>1:1 · 1:* · *:* · קשר תלות</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <table>
+        <tr><th>קשר</th><th>כלל מיפוי</th></tr>
+        <tr><td><strong>1:1</strong></td><td>מוסיפים את מפתח אחת הטבלאות כשדה רגיל (מפתח זר) בטבלה השנייה.</td></tr>
+        <tr><td><strong>1:*</strong></td><td>מוסיפים את מפתח טבלת ה-"1" כמפתח זר בטבלת ה-"*". <br><span class="mono">Student(Id, name, Dep_num→FK)</span></td></tr>
+        <tr><td><strong>*:*</strong></td><td>יוצרים <strong>טבלה חדשה</strong>. המפתח הראשי שלה מורכב ממפתחות שתי הישויות. <br><span class="mono">ProjEmp(proj_code, emp_id, hours)</span></td></tr>
+        <tr><td><strong>קשר תלות</strong> (חלש)</td><td>מפתח הישות החזקה נכנס כחלק מהמפתח הראשי של הישות החלשה. <br><span class="mono">EmpChildren(emp_id, child_id, name, …)</span></td></tr>
+      </table>
+      <div class="note pit">ב-*:* תמיד נוצרת טבלה שלישית — אל תנסה לדחוף FK לאחד הצדדים. המפתח הראשי שלה <strong>מורכב</strong> משני המפתחות הזרים יחד.</div>
+      <div class="qa"><button onclick="qa(this)">מיפוי קשר 1:* — לאן נכנס המפתח הזר?</button>
+        <div class="ans">תמיד לצד ה-"רבים" (*). מפתח טבלת ה-"1" יושב כשדה רגיל (FK) בטבלת ה-"*". לוגיקה: לכל רשומה בצד הרבים יש בדיוק הורה אחד, אז אפשר לאחסן את ההפניה אצלה.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 3 -->
+<section id="p3" class="part">
+  <div class="part-head"><span class="part-num">חלק ג</span><h2>מחלקות מתקדמות</h2></div>
+  <p class="part-intro">מחלקה מופשטת ופולימורפיזם, ושלושת סוגי המחלקות במידול מערכת: ממשק, בקרה, נתונים (MVC).</p>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">מחלקה מופשטת ופולימורפיזם<small>abstract class · abstract method</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>מחלקה <strong>מופשטת</strong> = מחלקה שאי-אפשר ליצור ממנה עצמים, אבל יש לה תכונות, פונקציות ומחלקות-משנה שיורשות ממנה. מטרתה: חיסכון ומניעת כפילויות.</p>
+      <ul>
+        <li>פונקציה מופשטת = רק <strong>הכרזה</strong>, ללא מימוש. המימוש קורה בתת-המחלקות (הגדרה מחדש).</li>
+        <li>שיטה מופשטת יוצרת <strong>"חוזה"</strong>: כל יורשת חייבת לממש אותה — או להישאר בעצמה מופשטת.</li>
+        <li>אין חובת מפתח למחלקה מופשטת (אין לה עצמים להבחין ביניהם).</li>
+        <li><strong>פולימורפיזם</strong>: אותה קריאה <code>getArea()</code> מתנהגת אחרת בכל יורשת (Rectangle/Triangle/Circle).</li>
+      </ul>
+      <pre><span class="c">// מחלקת בסיס מופשטת</span>
+public abstract class Shape {
+    protected Color color;
+    public void setColor(Color c){ this.color = c; }
+    public abstract double getArea();   <span class="c">// ללא מימוש</span>
+}
+public class Rectangle extends Shape {
+    protected double width, height;
+    public double getArea(){ return width*height; } <span class="c">// מימוש מחדש</span>
+}</pre>
+      <div class="note pit">ניסיון ליצור עצם ממחלקה מופשטת = שגיאת הידור: <span class="mono">class Shape is abstract; cannot be instantiated</span>. אם נשאלת "האם זו מחלקה מופשטת?" — חפש מחלקת-על שמכילה רק הגדרות משותפות בלי עצמים משלה.</div>
+      <div class="qa"><button onclick="qa(this)">למה צורה (Shape) היא מועמדת מצוינת למחלקה מופשטת?</button>
+        <div class="ans">כי לעולם לא ניצור "צורה" סתמית — תמיד מלבן/עיגול/משולש קונקרטי. אבל לכולן משותפות תכונות (צבע, שטח, היקף) ופעולות (חשב שטח, צייר). מגדירים את המשותף פעם אחת ב-Shape ומחייבים כל יורשת לממש את getArea() בדרכה.</div></div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">מחלקות גבול: ממשק · בקרה · נתונים<small>boundary / control / entity — הלב של המבחן</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>בניתוח מ"מ 1 הכרת רק מחלקות <strong>נתונים</strong>. בקורס הזה מוסיפים שתיים:</p>
+      <table>
+        <tr><th>מחלקה</th><th>מייצגת</th><th>דוגמה</th></tr>
+        <tr><td><strong>ממשק</strong> (Boundary)</td><td>מה שהמשתמש רואה — טפסים, דו"חות</td><td>טופס הזנת מוצר</td></tr>
+        <tr><td><strong>בקרה</strong> (Control)</td><td>תהליך/פעילות — מתווך בין ממשק לנתונים (שאילתות, לוגיקה)</td><td>בקרת הזמנות</td></tr>
+        <tr><td><strong>נתונים</strong> (Entity)</td><td>טבלאות הנתונים</td><td>מוצרים, לקוחות</td></tr>
+      </table>
+      <h4>זרימת MVC: משתמש ← ממשק ← בקרה ← נתונים</h4>
+      <div class="dia">
+        <svg viewBox="0 0 470 70" width="470">
+          <rect class="uml-box" x="10" y="20" width="80" height="32" rx="4"/><text class="uml-txt" x="50" y="40" text-anchor="middle">משתמש</text>
+          <rect class="uml-box" x="125" y="20" width="80" height="32" rx="4"/><text class="uml-txt" x="165" y="40" text-anchor="middle">ממשק</text>
+          <rect class="uml-box" x="240" y="20" width="80" height="32" rx="4"/><text class="uml-txt" x="280" y="40" text-anchor="middle">בקרה</text>
+          <rect class="uml-box" x="355" y="20" width="100" height="32" rx="4"/><text class="uml-txt" x="405" y="40" text-anchor="middle">נתונים</text>
+          <line class="uml-line" x1="90" y1="36" x2="123" y2="36" marker-end="url(#ar)"/>
+          <line class="uml-line" x1="205" y1="36" x2="238" y2="36" marker-end="url(#ar)"/>
+          <line class="uml-line" x1="320" y1="36" x2="353" y2="36" marker-end="url(#ar)"/>
+          <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#22403F" stroke-width="1.4"/></marker></defs>
+        </svg>
+      </div>
+      <div class="note key">כללי הקשרים שחייבים לזכור:<br>• ממשק ↔ בקרה = <strong>1:1</strong><br>• בקרה ↔ נתונים = <strong>1:* (יחיד-לרבים)</strong>, כשהבקרה בצד ה-"1".<br>• מחלקות הממשק והבקרה מכילות את הפונקציות שהמשתמש צריך, ו<strong>חייבות להכיר</strong> את הפונקציות שימומשו במחלקת הנתונים.</div>
+      <div class="note pit">מתי יוצרים מחלקות ממשק ובקרה? <strong>לא בסעיף תרשים המחלקות הראשון</strong> (שם רק נתונים). יוצרים אותן כשמגיעים לתרשים הרצף — ואז חוזרים ומעדכנים את תרשים המחלקות. שמרו על שמות זהים בין הממשק לבקרה לאותה ישות.</div>
+      <div class="qa"><button onclick="qa(this)">תהליך "שמירת מוצר" — מי מדבר עם מי?</button>
+        <div class="ans">המשתמש מזין נתונים ל<strong>טופס</strong> (ממשק) ולוחץ "שמור". הממשק מכיר את הפונקציה save ומעביר אותה ל<strong>בקרה</strong>. הבקרה (המנהלת של מחלקת הנתונים) מעבירה את הפקודה ל<strong>מחלקת הנתונים</strong> שמבצעת בפועל ומחזירה OK חזרה במעלה השרשרת.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 4 -->
+<section id="p4" class="part">
+  <div class="part-head"><span class="part-num">חלק ד</span><h2>תרשימי UML</h2></div>
+  <p class="part-intro">13 סוגי תרשימים ב-UML, מחולקים ל-3 קבוצות. אלה שבמבחן: מחלקות, עצמים, Use-Case, פעילות, מצבים, רצף.</p>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">מפת התרשימים: 3 קבוצות<small>מבניים · התנהגותיים · אינטראקציה</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <table>
+        <tr><th>קבוצה</th><th>מידול</th><th>תרשימים עיקריים</th></tr>
+        <tr><td><strong>מבניים</strong></td><td>סטטי</td><td>מחלקות, עצמים, רכיבים, פריסה, חבילות</td></tr>
+        <tr><td><strong>התנהגותיים</strong></td><td>דינמי</td><td>פעילות, מצבים, Use-Case</td></tr>
+        <tr><td><strong>אינטראקציה</strong></td><td>דינמי</td><td>רצף, שיתוף-פעולה, תזמון</td></tr>
+      </table>
+      <div class="note tip">UML מאגדת טכניקות ותרשימים לייצוג ואפיון התנהגות מערכת המידע. כולל היום 13 סוגי דיאגרמות.</div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">תרשים תרחיש שימוש (Use Case)<small>שחקנים · גבולות · include מול extend</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>UC = רצף פעולות שהמערכת מבצעת כדי להפיק תוצאה עבור <strong>שחקן</strong>. מתאר <strong>פונקציונליות</strong>, לא תהליכים. הוא "סיפור" — התרשים מלווה בטקסט.</p>
+      <ul>
+        <li><strong>מלבן</strong> = גבולות המערכת. בתוכו האליפסות (UC), מחוץ לו השחקנים.</li>
+        <li><strong>שחקן</strong> = גורם חיצוני עם אינטראקציה למערכת (אדם / מערכת אחרת / חומרה).</li>
+        <li><strong>אליפסה</strong> = תרחיש שימוש בודד, עם שמו בפנים.</li>
+        <li>מחברים שחקן ל-UC <strong>רק</strong> כשיש אינטראקציה (קלט/פלט) איתו. פעולה אוטומטית = בלי שחקן.</li>
+      </ul>
+      <h4>שני קשרי התלות בין UC-ים</h4>
+      <table>
+        <tr><th>קשר</th><th>מתי</th><th>מילות מפתח</th></tr>
+        <tr><td><code>&lt;&lt;include&gt;&gt;</code> (שימוש)</td><td>קשר <strong>הכרחי</strong> — ה-UC הבסיסי תמיד משתמש בו</td><td>"בכל פעם", "תמיד"</td></tr>
+        <tr><td><code>&lt;&lt;extend&gt;&gt;</code> (הרחבה)</td><td>קשר <strong>אפשרי</strong> — מתבצע רק בתנאי</td><td>"במידה ו...", "אם..."</td></tr>
+      </table>
+      <div class="note pit">המבחן לבחירה: שאל את עצמך — "האם ה-UC הבסיסי שלם בלי זה?" אם כן → extend (אופציונלי). אם הבסיסי לא יכול לעבוד בלעדיו → include (חובה). דוגמה: "וידוא כרטיס אשראי" ברכישה = include; "שדרוג רמת גימור" ברכישת רכב = extend.</div>
+      <h4>טבלת תיאור מילולי של UC (לפי שובל-פרץ)</h4>
+      <table>
+        <tr><td>Use Case Name</td><td>שם האליפסה</td></tr>
+        <tr><td>Actors</td><td>השחקנים המשתתפים</td></tr>
+        <tr><td>Description</td><td>תיאור קצר של מהות הפונקציונליות</td></tr>
+        <tr><td>References</td><td>קישורים ל-UC אחרים (include/extend)</td></tr>
+        <tr><td>Typical Course of Events</td><td>2 עמודות: Actor Action ⟷ System Response, צעדים ממוספרים</td></tr>
+        <tr><td>Alternate courses</td><td>מקרים מיוחדים וטיפול בשגיאות ("אם כרטיס נדחה — דרוש מזומן")</td></tr>
+        <tr><td>Preconditions</td><td>תנאי קדם לפני ה-UC</td></tr>
+        <tr><td>Post conditions</td><td>תנאים שמתקיימים אחרי ה-UC</td></tr>
+        <tr><td>Assumptions</td><td>הנחות יסוד</td></tr>
+      </table>
+      <div class="qa"><button onclick="qa(this)">UC מתאר תהליך או פונקציונליות?</button>
+        <div class="ans"><strong>פונקציונליות.</strong> כספומט = "משיכת כסף", "בירור יתרה" — ולא את צעדי התהליך הפנימי. את הצעדים מתארים בטבלת ה-UC או בתרשים רצף/פעילות.</div></div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">תרשים פעילות (Activity Diagram)<small>תרשים זרימה של תהליך</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>רצף הצעדים/פעילויות המתאר תהליך במערכת — בעצם תרשים זרימה. מתאים ללוגיקות מורכבות (סיכום חשבון במסעדה, השאלת ספר, כניסה לבניין).</p>
+      <h4>רכיבים</h4>
+      <ul>
+        <li><strong>עיגול מלא</strong> = התחלה; <strong>עיגול בתוך טבעת</strong> = סיום.</li>
+        <li><strong>מלבן מעוגל</strong> = פעילות/צעד.</li>
+        <li><strong>מעוין</strong> = תנאי (החלטה) עם הסתעפות כן/לא.</li>
+        <li><strong>קו עבה (fork/join)</strong> = פיצול לפעילויות מקבילות ואיחודן.</li>
+      </ul>
+      <div class="dia">
+        <svg viewBox="0 0 150 230" width="120">
+          <circle cx="75" cy="15" r="8" fill="#22403F"/>
+          <line class="uml-line" x1="75" y1="23" x2="75" y2="40"/>
+          <rect class="uml-box" x="35" y="40" width="80" height="26" rx="12"/><text class="uml-txt" x="75" y="57" text-anchor="middle">צעד 1</text>
+          <line class="uml-line" x1="75" y1="66" x2="75" y2="80"/>
+          <polygon points="75,80 105,105 75,130 45,105" class="uml-box"/><text class="uml-txt" x="75" y="109" text-anchor="middle">תנאי?</text>
+          <line class="uml-line" x1="105" y1="105" x2="135" y2="105"/><text class="uml-txt" x="118" y="100">כן</text>
+          <line class="uml-line" x1="75" y1="130" x2="75" y2="150"/><text class="uml-txt" x="62" y="145">לא</text>
+          <rect class="uml-box" x="35" y="150" width="80" height="26" rx="12"/><text class="uml-txt" x="75" y="167" text-anchor="middle">צעד 2</text>
+          <line class="uml-line" x1="75" y1="176" x2="75" y2="195"/>
+          <circle cx="75" cy="205" r="9" fill="none" stroke="#22403F" stroke-width="1.6"/><circle cx="75" cy="205" r="4.5" fill="#22403F"/>
+        </svg>
+      </div>
+      <div class="qa"><button onclick="qa(this)">מתי נשתמש בקו fork/join?</button>
+        <div class="ans">כשפעילויות מתבצעות <strong>במקביל</strong> ואינן תלויות זו בזו — מפצלים בקו עבה לכמה זרימות, ומאחדים בקו עבה נוסף לפני ההמשך.</div></div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">תרשים מצבים (State Diagram)<small>מחזור חיי העצם · transitions</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>מתאר התנהגות דינמית של <strong>אובייקט יחיד</strong> לאורך חייו — המצבים שהוא עובר והמעברים (Transitions) ביניהם בעקבות תרחיש/תנאי. נפוץ במערכות זמן-אמת (real-time).</p>
+      <h4>תהליך בנייה</h4>
+      <ul>
+        <li>למד את התנהגות המחלקה</li>
+        <li>מדל לוגיקות התנהגות <strong>רגילות</strong></li>
+        <li>הוסף לוגיקות התנהגות <strong>לא-רגילות</strong> (שגיאות, אזעקה)</li>
+        <li>עדן את המודל ובדוק מול תרשימי אינטראקציה ומחלקות</li>
+      </ul>
+      <div class="dia">
+        <svg viewBox="0 0 320 120" width="320">
+          <rect class="uml-box" x="20" y="45" width="70" height="30" rx="14"/><text class="uml-txt" x="55" y="64" text-anchor="middle">Idle</text>
+          <rect class="uml-box" x="130" y="10" width="80" height="30" rx="14"/><text class="uml-txt" x="170" y="29" text-anchor="middle">In Work</text>
+          <rect class="uml-box" x="130" y="80" width="80" height="30" rx="14"/><text class="uml-txt" x="170" y="99" text-anchor="middle">Waiting</text>
+          <line class="uml-line" x1="90" y1="55" x2="130" y2="28" marker-end="url(#ar2)"/><text class="uml-txt" x="96" y="38" font-size="10">insert card</text>
+          <line class="uml-line" x1="170" y1="40" x2="170" y2="78" marker-end="url(#ar2)"/><text class="uml-txt" x="174" y="62" font-size="10">finished</text>
+          <line class="uml-line" x1="130" y1="95" x2="90" y2="68" marker-end="url(#ar2)"/><text class="uml-txt" x="92" y="90" font-size="10">card taken</text>
+          <defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6" fill="none" stroke="#22403F" stroke-width="1.4"/></marker></defs>
+        </svg>
+      </div>
+      <div class="note key">דוגמאות-עוגן מהמבחנים: <strong>כספומט</strong> (Idle→In Work→Waiting) ו<strong>שער/קרוסלה ברכבת</strong> (נעול→פתוח). את הקרוסלה מרחיבים בהדרגה: התנהגות רגילה → התנהגות לא-רגילה (אזעקה בניסיון מעבר בנעול) → עידון (מצב "הפרת חוק" שנשבר רק ב-Reset).</div>
+      <div class="qa"><button onclick="qa(this)">במה תרשים מצבים שונה מתרשים פעילות?</button>
+        <div class="ans">מצבים = איך <strong>עצם בודד</strong> משנה מצב לאורך חייו (state→transition→state). פעילות = רצף <strong>צעדי תהליך</strong> שלם, אולי על פני כמה גורמים, עם תנאים והסתעפויות. מצבים מתמקד בישות; פעילות בזרימת התהליך.</div></div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">תרשים מחלקות ותרשים עצמים<small>Class Diagram · Object Diagram</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <h4>תרשים מחלקות</h4>
+      <p>הליבה של המבחן — מתאר את מחלקות התוכנה והקשרים ביניהן. כל מחלקה = מלבן ב-3 חלקים: שם / תכונות / פונקציות. <strong>+</strong> = public, <strong>-</strong> = private/protected.</p>
+      <h4>תרשים עצמים (פחות נפוץ)</h4>
+      <ul>
+        <li><strong>מופע</strong> של תרשים מחלקות — תמונה רגעית של נתוני המערכת.</li>
+        <li>כותרת העצם = <code>שם_עצם : שם_מחלקה</code>, ולכל תכונה ערך קונקרטי.</li>
+        <li>כלי לבדיקת תאימות המודל למציאות. לתרשים מחלקות אחד יש מספר תרשימי עצמים אפשריים.</li>
+      </ul>
+      <div class="dia">
+        <svg viewBox="0 0 180 110" width="170">
+          <rect class="uml-box" x="20" y="15" width="140" height="80" rx="2"/>
+          <line class="uml-line" x1="20" y1="40" x2="160" y2="40"/>
+          <text class="uml-txt" x="90" y="32" text-anchor="middle" text-decoration="underline">st : Student</text>
+          <text class="uml-txt" x="28" y="58">id = 305...</text>
+          <text class="uml-txt" x="28" y="74">name = "Omer"</text>
+          <text class="uml-txt" x="28" y="90">avg = 92.4</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">תרשים רצף (Sequence Diagram)<small>הקשר בין UC, תרשים מחלקות ומחלקות גבול</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <p>מתאר את פעילות הגומלין בין העצמים לאורך <strong>ציר זמן</strong>, דרך מסרים (messages). חוליה מקשרת: ה-UC מציג <em>פעילות</em>, תרשים המחלקות מציג <em>מחלקות עם פונקציות</em>, ותרשים הרצף מראה את <em>יחסי הגומלין</em> ביניהן.</p>
+      <h4>סימונים</h4>
+      <ul>
+        <li>מסר = חץ עם <strong>שם הפונקציה</strong>.</li>
+        <li>שחקן (Actor), מחלקת ממשק, מחלקת בקרה, אובייקט ספציפי (<code>St : Student</code>) או כללי (<code>: Courses</code>).</li>
+        <li><strong>לולאה</strong> = מעבר מחזורי על מספר אובייקטים.</li>
+        <li><strong>Ref</strong> = הפניה לתת-תרשים רצף (תהליך נפרד).</li>
+      </ul>
+      <h4>כללי ברזל בתרשים רצף</h4>
+      <ul>
+        <li>אפשר לשלוח מסר רק אם (א) יש <strong>קשר בין המחלקות</strong> בתרשים המחלקות, ו-(ב) המתודה היא <code>public</code>.</li>
+        <li>מחלקות ממשק מדברות עם מחלקות הנתונים <strong>אך ורק דרך מחלקות הבקרה</strong>.</li>
+        <li>כל פונקציה חייבת להיות מוכרת בשני הצדדים (אצל המחלקה שמקבלת).</li>
+        <li>התרשים מתחיל בשחקן שמאתחל אותו; פונקציה בודדת לאובייקט בודד (אלא אם לולאה).</li>
+        <li>יצירת אובייקט חדש לראשונה — מצוירת נמוך יותר, לפי התקדמות הזמן.</li>
+      </ul>
+      <div class="note pit">זה הסעיף שמייצר את מחלקות הממשק והבקרה! אם מבקשים תרשים רצף ל"הוספת לקוח חדש" — תיצור <code>ממשק לקוחות</code> ו<code>בקרת לקוחות</code> בנוסף למחלקת הנתונים "לקוחות" שכבר קיימת, ואז תחזור לעדכן את תרשים המחלקות.</div>
+      <div class="qa"><button onclick="qa(this)">סדר השכבות בתרשים רצף של "רכישת מוצר"?</button>
+        <div class="ans">שחקן (Employee) → ממשק (Orders&amp;Products) → בקרה (Orders&amp;Products) → מחלקות נתונים (Product, Order, OrderItem). הממשק מעולם לא קופץ ישר לנתונים — תמיד דרך הבקרה. תהליך התשלום מופנה ל-Ref. Payment נפרד.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 5 -->
+<section id="p5" class="part">
+  <div class="part-head"><span class="part-num">חלק ה</span><h2>Design Patterns</h2></div>
+  <p class="part-intro">תבניות עיצוב לבעיות חוזרות בתכנות מונחה-עצמים. מטרות: שימוש חוזר, בהירות, וחיסכון בטעויות.</p>
+  <div class="topic" data-topic>
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">שלוש הקטגוריות וחמש התבניות<small>Prototype · Composite · Adapter · Strategy · Observer</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <table>
+        <tr><th>קטגוריה</th><th>מתי</th><th>דוגמאות</th></tr>
+        <tr><td><strong>ייצור עצמים</strong> (Creational)</td><td>כשיצירת עצם לא טריוויאלית/תחת מגבלות</td><td>Singleton, Prototype</td></tr>
+        <tr><td><strong>מבניים</strong> (Structural)</td><td>כשדרושות מודולריות ויעילות</td><td>Adapter, Composite</td></tr>
+        <tr><td><strong>התנהגותיים</strong> (Behavioral)</td><td>מודולריות ודינמיות דרך פולימורפיזם</td><td>Observer, Strategy</td></tr>
+      </table>
+      <h4>חמש התבניות מהקורס</h4>
+      <table>
+        <tr><th>תבנית</th><th>הבעיה שהיא פותרת</th></tr>
+        <tr><td><strong>Prototype</strong></td><td>איך לייצר העתק של עצם פולימורפי שטיפוסו ידוע רק בזמן ריצה. פתרון: פונקציה וירטואלית <code>Clone()</code> שמחזירה העתק. יתרון: מודולריות + יעילות. חיסרון: לא ניתן להעביר פרמטרים.</td></tr>
+        <tr><td><strong>Composite</strong></td><td>מבנה <strong>רקורסיבי</strong> — מחלקה שמכילה מחלקות מאותו סוג. מחלקת composite מנהלת רשימת מחלקות פשוטות ופונה אליהן. שימושי בייצוג טקסטים וב-GUI.</td></tr>
+        <tr><td><strong>Adapter</strong></td><td>גישור בין ממשקים לא-תואמים — מתאם שמאפשר לעצם מטיפוס B לעבוד עם עצמים שמצפים לטיפוס A.</td></tr>
+        <tr><td><strong>Strategy</strong></td><td>הפרדת <strong>האלגוריתם</strong> מהמחלקה שמריצה אותו — מאפשר להחליף לוגיקה בלי לשנות את המחלקה.</td></tr>
+        <tr><td><strong>Observer</strong></td><td>עצם מעדכן אחרים ברגע שמתרחש אירוע (כמו לחיצת כפתור). <code>Subject</code> מדווח על Event, ומחלקות שמממשות <code>Observer</code> מתעדכנות — מודולריות ואי-תלות מקסימלית.</td></tr>
+      </table>
+      <div class="qa"><button onclick="qa(this)">דוגמה קלאסית ל-Observer מהמבחן</button>
+        <div class="ans">מערכת דואר: מחלקת "שעון" צריכה "להודיע" על חצות למחלקות הודעות והודעות-לארכיון. דרישה: מודולריות ואי-תלות — לא רוצים שהשעון (ה-Subject) והמיודעים (Observers) יהיו קשורים בקוד. השעון מודיע, וכל מי שנרשם כ-Observer מגיב.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DIAGRAM CHOOSER -->
+<section id="chooser" class="part">
+  <div class="part-head"><span class="part-num">🧭</span><h2>מצפן התרשים</h2></div>
+  <p class="part-intro">לא בטוח איזה תרשים השאלה דורשת? לחץ על מה שהשאלה מבקשת לתאר וקבל את התרשים הנכון.</p>
+  <div class="chooser">
+    <h3>מה השאלה מבקשת לתאר?</h3>
+    <p class="sm">בחר את התיאור שהכי מתאים לניסוח השאלה.</p>
+    <div class="opts" id="chOpts"></div>
+    <div class="result" id="chRes"></div>
+  </div>
+</section>
+
+<!-- PRACTICE -->
+<section id="practice" class="part">
+  <div class="part-head"><span class="part-num">🏋️</span><h2>תרגולים עם פתרון</h2></div>
+  <p class="part-intro">בנה כל אחד <strong>ביד על דף</strong> לפני שאתה פותח את הפתרון. זה התרגול שמעלה ציון.</p>
+
+  <div class="prac">
+    <span class="tag">תרשים מחלקות</span>
+    <h4>חדר הכושר — תרשים מחלקות מלא</h4>
+    <p class="scenario">חדר כושר שומר נתונים על עובדים, לקוחות, מנויים, סוגי מנויים ורכישות בחנות. חלק מהעובדים הם מדריכים (התמחות אחת או יותר). ללקוח יכולים להיות כמה מנויים. ניתן לבצע הזמנות למוצרים (ללא הגבלת כמות), ולשלם גם באשראי. נדרש לאפשר: הוספת לקוח, יצירת הזמנה, יצירת מנוי, בחירת/עדכון סוג מנוי, שינוי סטטוס הזמנה, הצגת מחיר כולל, בחירת מוצר, הוספת עובד.</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      <strong>ישויות (מחלקות נתונים):</strong> Employees, Customers, Members, MembersTypes, Instructors, Orders, OrderItem, Products, רשימת התמחויות, Shift schedule, Employees/Customers Attendance.<br><br>
+      <strong>קשרים מרכזיים:</strong><br>
+      • Customer ↔ Member = 1:* (ללקוח כמה מנויים).<br>
+      • MembersType ↔ Members = 1:* (סוג מנוי משותף להרבה מנויים).<br>
+      • Order ↔ OrderItem = 1:* ; OrderItem ↔ Product = *:1.<br>
+      • Instructor ↔ התמחות = *:* (מדריך כמה התמחויות, התמחות לכמה מדריכים) → דורש מחלקה אמצעית.<br>
+      • Employee ↔ Instructor = הורשה (מדריך הוא סוג של עובד).<br><br>
+      <strong>פונקציות לדוגמה:</strong> <code>CreateNewCustomer()</code>, <code>CreateNewOrder()</code>, <code>ChangeOrderStatus()</code>, <code>CalculateTotalCharge()</code>, <code>UpdatePrice()</code>, <code>AddNewEmployee()</code>.<br><br>
+      <strong>אל תשכח:</strong> בסעיף הזה — <strong>מחלקות נתונים בלבד</strong>. את הממשק והבקרה תוסיף כשתגיע לסעיף תרשים הרצף.
+    </div>
+  </div>
+
+  <div class="prac">
+    <span class="tag">תרשים פעילות</span>
+    <h4>חשבון במסעדה</h4>
+    <p class="scenario">מחשבים את סכום כל המנות. אם הלקוח חבר מועדון — 10% הנחה; ואם גם יום הולדת — מפחיתים את המנה שאכל. תמיד מוסיפים דמי אבטחה. אם הלקוח ביקש להוריד דמי אבטחה — מורידים שקל מכל סועד. בסיום מדפיסים את החשבון.</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      התחלה → "חשב סכום מנות" → תנאי <em>חבר מועדון?</em> → אם כן: הנחה 10% → תנאי <em>יום הולדת?</em> → אם כן: הפחת מנת הלקוח → "הוסף דמי אבטחה" → תנאי <em>ביקש להוריד אבטחה?</em> → אם כן: "הורד שקל × מספר סועדים" → "הדפס חשבון" → סיום.<br><br>
+      <strong>מלכודת:</strong> כל "אם" בטקסט = מעוין תנאי עם הסתעפות כן/לא. "תמיד" = פעולה ללא תנאי.
+    </div>
+  </div>
+
+  <div class="prac">
+    <span class="tag">תרשים מצבים</span>
+    <h4>שער (קרוסלה) ברכבת — כולל התנהגות חריגה</h4>
+    <p class="scenario">השער נפתח בעת העברת כרטיס/מטבע והלקוח עובר. הרחבה: ניסיון מעבר במצב נעול → מפעיל אזעקה, והמערכת נכנסת ל"הפרת חוק". במצב זה היא נשארת גם אם מכניסים מטבע/מנסים לעבור — עד לחיצת Reset, שמחזירה למצב נעול.</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      מצבים: <strong>Locked</strong> (התחלתי) → [insert coin] → <strong>Unlocked</strong> → [pass] → Locked.<br>
+      התנהגות חריגה: ב-Locked, [try to pass] → אזעקה → <strong>Violation</strong>. ב-Violation: [coin / try pass] → נשאר ב-Violation; [Reset] → Locked.<br><br>
+      <strong>שיטה:</strong> בנה קודם את הזרימה הרגילה (locked↔unlocked), ורק אז הוסף את המצב החריג והמעברים אליו וממנו. זה בדיוק תהליך הבנייה ההדרגתי שהמרצה מלמד.
+    </div>
+  </div>
+
+  <div class="prac">
+    <span class="tag">Use Case</span>
+    <h4>רכישת מוצרים עם תשלום באשראי</h4>
+    <p class="scenario">מערכת המאפשרת ללקוחות לרכוש מוצרים, וניתן לשלם גם באשראי. בנה תרשים Use Case (התמקד בפונקציונליות).</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      שחקנים: <strong>לקוח</strong>, <strong>חברת אשראי</strong> (חיצונית).<br>
+      UC עיקריים: "בחר מוצר", "בצע רכישה", "שלם". <br>
+      • "בצע רכישה" <code>&lt;&lt;include&gt;&gt;</code> "שלם" (חובה — אין רכישה בלי תשלום).<br>
+      • "שלם" <code>&lt;&lt;extend&gt;&gt;</code> "תשלום באשראי" (אפשרי — "במידה ו..." בחר אשראי).<br>
+      • חבר את הלקוח ל-UC שיש בהם אינטראקציה. "וידוא כרטיס אשראי" מתחבר לחברת האשראי ולא ללקוח. פעולה אוטומטית (הדפסת קבלה) — ללא חיבור שחקן.
+    </div>
+  </div>
+
+  <div class="prac">
+    <span class="tag">תרשים רצף</span>
+    <h4>רכישת מוצר — מי מדבר עם מי</h4>
+    <p class="scenario">תאר בתרשים רצף את תרחיש רכישת המוצר בחדר הכושר. גזור מהשאלה אילו מחלקות ממשק ובקרה צריך להוסיף.</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      ציר השחקן Employee → <strong>Interface: OrdersAndProducts</strong> → <strong>Controller: OrdersAndProducts</strong> → מחלקות נתונים <strong>Product / Order / OrderItem</strong>.<br>
+      רצף מסרים: <code>ShowProductDetails()</code> → (בקרה) <code>GetProductDetails()</code> (מ-Product) → <code>CreateNewOrder()</code> → <code>ChooseProduct()</code> → <code>AddNewItem()</code> → <code>UpdateQty/Price()</code> → <code>ShowTotalCharge()</code> → <code>CalculateTotalCharge()</code> → <code>Pay()</code> מופנה ל-<strong>Ref. Payment</strong>.<br><br>
+      <strong>זכור:</strong> כל פונקציה ששלחת חייבת להופיע במחלקה המקבלת בתרשים המחלקות, והממשק לעולם לא ניגש ישירות לנתונים.
+    </div>
+  </div>
+
+  <div class="prac">
+    <span class="tag">הורשה / מחלקה מופשטת</span>
+    <h4>צורות גיאומטריות</h4>
+    <p class="scenario">שמירת צורות (משולש, מלבן, עיגול) עם צבע, היקף, שטח. למשולש: קודקוד, בסיס, גובה; למלבן: אורך, רוחב; לעיגול: רדיוס, מרכז. המערכת מחשבת היקף/שטח, מדפיסה פרטים ומציירת.</p>
+    <button class="sol" onclick="sol(this)">הצג פתרון מנחה</button>
+    <div class="solbox">
+      מחלקת-על <strong>מופשטת</strong> Shape: תכונה משותפת <code>color</code>, פונקציות <code>computeArea()</code>, <code>computePerimeter()</code>, <code>draw()</code>, <code>printDetails()</code> — חלקן מופשטות.<br>
+      יורשות: Rectangle(אורך,רוחב), Triangle(בסיס,גובה,קודקוד), Circle(רדיוס,מרכז) — כל אחת מממשת מחדש את <code>computeArea()</code> (פולימורפיזם).<br>
+      חץ הורשה <strong>חלול</strong> מכל יורשת אל Shape.
+    </div>
+  </div>
+</section>
+
+<!-- STUDY PLAN -->
+<section id="plan" class="part">
+  <div class="part-head"><span class="part-num">📅</span><h2>תוכנית לימודים — 10 ימים</h2></div>
+  <p class="part-intro">דחוס? קמפֵּל ל-5 ימים (אחד אחד ביום). יש זמן? פרוס ל-14. העיקרון קבוע: ללמוד נושא → לתרגל אותו ביד → לעבור הלאה.</p>
+  <div class="plan">
+    <div class="day"><h4>יסודות מונחה-עצמים</h4><div class="meta">חלק א · 1.5–2 שעות</div>
+      <ul><li>עצם, מחלקה, תכונה (3 סוגים), מפתח, CRUD</li><li>תרגול: צייר מחלקה בודדת מתרחיש קצר</li></ul></div>
+    <div class="day"><h4>קשרים ואילוצי ריבוי</h4><div class="meta">חלק א</div>
+      <ul><li>5 הקשרים + ההבדל הקבצה/הרכבה</li><li>תרגול: זהה קשרים וריבוי בתרחיש חדר הכושר; פרק רבים-לרבים</li></ul></div>
+    <div class="day"><h4>מיפוי למסד נתונים</h4><div class="meta">חלק ב</div>
+      <ul><li>כללי 1:1, 1:*, *:*, קשר תלות</li><li>תרגול: מפה את תרשים חדר הכושר לטבלאות עם PK/FK</li></ul></div>
+    <div class="day"><h4>מחלקה מופשטת ופולימורפיזם</h4><div class="meta">חלק ג</div>
+      <ul><li>abstract class/method, חוזה, פולימורפיזם</li><li>תרגול: תרגיל הצורות</li></ul></div>
+    <div class="day"><h4>מחלקות ממשק/בקרה/נתונים</h4><div class="meta">חלק ג · נושא קריטי</div>
+      <ul><li>MVC, כללי הקשרים (1:1, 1:*)</li><li>תרגול: שרטט זרימת "שמירת מוצר" משתמש→ממשק→בקרה→נתונים</li></ul></div>
+    <div class="day"><h4>Use Case</h4><div class="meta">חלק ד</div>
+      <ul><li>שחקנים, גבולות, include מול extend, טבלת UC</li><li>תרגול: UC לרכישה עם אשראי + טבלה מלאה ל-UC אחד</li></ul></div>
+    <div class="day"><h4>פעילות + מצבים</h4><div class="meta">חלק ד</div>
+      <ul><li>תרשים פעילות (תנאים, מקבילות) + תרשים מצבים</li><li>תרגול: חשבון מסעדה (פעילות) + קרוסלה עם אזעקה (מצבים)</li></ul></div>
+    <div class="day"><h4>תרשים מחלקות מלא + עצמים</h4><div class="meta">חלק ד</div>
+      <ul><li>חיבור הכל: נתונים + ממשק + בקרה בתרשים אחד</li><li>תרגול: תרשים מחלקות מלא לחדר הכושר</li></ul></div>
+    <div class="day"><h4>תרשים רצף</h4><div class="meta">חלק ד · הסעיף שמחבר הכל</div>
+      <ul><li>כללי הברזל, יצירת ממשק/בקרה, Ref, לולאות</li><li>תרגול: רצף "רכישת מוצר" כולל Ref. Payment</li></ul></div>
+    <div class="day"><h4>Design Patterns + מבחן יבש</h4><div class="meta">חלק ה + סיכום</div>
+      <ul><li>5 התבניות + הקטגוריות</li><li>תרגול אמת: פתור מבחן 2013 שלם בתנאי זמן, חומר פתוח, על דף</li></ul></div>
+  </div>
+</section>
+
+<!-- TIPS -->
+<section id="tips" class="part">
+  <div class="part-head"><span class="part-num">💡</span><h2>טיפים להצלחה</h2></div>
+  <div class="topic open">
+    <button class="t-head" onclick="toggle(this)">
+      <span class="t-check" onclick="check(event,this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></span>
+      <span class="t-title">10 טיפים שמעלים ציון<small>אסטרטגיה למבחן חומר-פתוח</small></span>
+      <span class="t-arrow">▾</span>
+    </button>
+    <div class="t-body">
+      <ul>
+        <li><strong>הכן "דף סימונים" אישי.</strong> צורות החצים (הקבצה/הרכבה/הורשה), סימני ריבוי, ומבנה טבלת ה-UC — שיהיו מול העיניים. במבחן פתוח חוסכים שניות יקרות.</li>
+        <li><strong>קרא את כל השאלה לפני שמתחילים לצייר.</strong> סעיף הרצף יכריח אותך להוסיף מחלקות ממשק ובקרה לתרשים המחלקות — תכנן מקום מראש.</li>
+        <li><strong>סמן בטקסט תוך כדי קריאה.</strong> שמות עצם = מחלקות; "שייך/כל...מספר" = קשרים וריבוי; "יש לאפשר..." = פונקציות.</li>
+        <li><strong>עקביות שמות.</strong> מחלקת הממשק והבקרה של אותה ישות יקבלו שם זהה (Interface: Orders / Controller: Orders).</li>
+        <li><strong>כל פונקציה צריכה בית.</strong> פונקציה שנשלחת בתרשים רצף חייבת להופיע במחלקה המקבלת בתרשים המחלקות — ושתי המחלקות חייבות להיות מחוברות.</li>
+        <li><strong>הקבצה מול הרכבה — שאל "זכות קיום".</strong> אם החלק שורד בלי השלם → הקבצה (חלול). אם לא → הרכבה (מלא).</li>
+        <li><strong>include מול extend — שאל "חובה?".</strong> תמיד מתבצע → include. רק "במידה ו..." → extend.</li>
+        <li><strong>בתרשים מצבים בנה בשכבות.</strong> קודם התנהגות רגילה, אחר כך חריגות (אזעקה/הפרת חוק), בסוף עידון. אל תנסה הכל בבת אחת.</li>
+        <li><strong>היצמד לדרישות, אבל אל תפחד להוסיף הגיוני.</strong> מותר להוסיף פונקציה סבירה; עדיף "יותר מדי הגיוני" מאשר לפספס דרישה מפורשת.</li>
+        <li><strong>תרגל מבחן 2013 שלם בתנאי אמת.</strong> זה המקור שהמרצה בנה עליו את הקורס — מבני השאלות חוזרים.</li>
+      </ul>
+      <div class="note tip">הזהב של הקורס הזה: <strong>תרחיש אחד, כל התרשימים.</strong> אם אתה יודע לקחת את "חדר הכושר" ולבנות ממנו מחלקות → טבלאות → Use-Case → פעילות → מצבים → רצף → אתה מוכן למבחן.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <b>בהצלחה במבחן, עומר 🍀</b><br>
+    מדריך זה נבנה מתוך כל 212 שקפי המצגת של הקורס · ניתוח מערכות מידע 2
+  </div>
+</footer>
+
+<script>
+/* ---- accordion ---- */
+function toggle(btn){ btn.parentElement.classList.toggle('open'); }
+/* ---- topic done checkbox ---- */
+function check(e,el){
+  e.stopPropagation();
+  el.classList.toggle('on');
+  updateProgress();
+}
+function updateProgress(){
+  const topics = document.querySelectorAll('.topic[data-topic]');
+  const total = topics.length;
+  let done = 0;
+  topics.forEach(t=>{ if(t.querySelector('.t-check').classList.contains('on')) done++; });
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById('pbar').style.width = pct+'%';
+  document.getElementById('ptxt').textContent = done+' / '+total+' נושאים';
+}
+/* ---- reveal QA ---- */
+function qa(b){ b.parentElement.classList.toggle('show'); }
+/* ---- practice solution ---- */
+function sol(b){
+  const p = b.parentElement;
+  p.classList.toggle('open');
+  b.textContent = p.classList.contains('open')?'הסתר פתרון':'הצג פתרון מנחה';
+}
+
+/* ---- diagram chooser ---- */
+const chData = [
+  {k:'מבנה סטטי של המערכת — מחלקות, תכונות, פונקציות וקשרים', d:'תרשים מחלקות (Class Diagram)', why:'התרשים המבני המרכזי. כל מחלקה במלבן 3-חלקי, עם קשרי ריבוי וירושה.'},
+  {k:'אילו פעולות המערכת מאפשרת למשתמש (פונקציונליות)', d:'תרשים תרחיש שימוש (Use Case)', why:'שחקנים מחוץ למלבן, אליפסות בפנים, וקשרי include/extend. מתאר פונקציונליות, לא צעדים.'},
+  {k:'תהליך עם החלטות, תנאים ופעולות מקבילות', d:'תרשים פעילות (Activity)', why:'תרשים זרימה: התחלה→צעדים→מעוין תנאי→fork/join→סיום. מצוין ללוגיקה מורכבת כמו חשבון מסעדה.'},
+  {k:'איך עצם בודד משנה מצב לאורך חייו', d:'תרשים מצבים (State)', why:'מצבים ומעברים (transitions) בעקבות תנאים. נפוץ במערכות זמן-אמת: כספומט, קרוסלה.'},
+  {k:'סדר המסרים בין עצמים לאורך זמן בתרחיש מסוים', d:'תרשים רצף (Sequence)', why:'ציר זמן אנכי. כאן נוצרות מחלקות הממשק והבקרה. ממשק→בקרה→נתונים בלבד.'},
+  {k:'תמונת מצב רגעית של נתונים אמיתיים במערכת', d:'תרשים עצמים (Object)', why:'מופע של תרשים מחלקות עם ערכים קונקרטיים. כלי לבדיקת תאימות למציאות.'},
+  {k:'תרגום התרשים לטבלאות מסד נתונים', d:'מיפוי ל-DB (טבלאות יחסיות)', why:'1:1→FK; 1:*→FK בצד הרבים; *:*→טבלה חדשה עם מפתח מורכב.'},
+];
+const optsEl = document.getElementById('chOpts');
+chData.forEach((o,i)=>{
+  const b=document.createElement('button');
+  b.textContent=o.k; b.dataset.i=i;
+  b.onclick=()=>{
+    optsEl.querySelectorAll('button').forEach(x=>x.classList.remove('sel'));
+    b.classList.add('sel');
+    const r=document.getElementById('chRes');
+    r.innerHTML='התרשים הנכון: <b>'+o.d+'</b><br><span style="color:#CFE0DA;font-size:.9rem">'+o.why+'</span>';
+    r.classList.add('show');
+  };
+  optsEl.appendChild(b);
+});
+
+/* ---- TOC active state on scroll ---- */
+const links=[...document.querySelectorAll('nav.toc a')];
+const ids=links.map(a=>a.getAttribute('href').slice(1));
+const obs=new IntersectionObserver((es)=>{
+  es.forEach(e=>{
+    if(e.isIntersecting){
+      const id=e.target.id;
+      links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+id));
+    }
+  });
+},{rootMargin:'-30% 0px -65% 0px'});
+ids.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});
+
+updateProgress();
+</script>
+</body>
+</html>
